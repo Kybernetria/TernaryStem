@@ -33,10 +33,19 @@ def warm_start_model(model: nn.Module, payload: dict) -> list[str]:
     return list(incompatible.missing_keys)
 
 
-def resume_training(model: nn.Module, optimizer: torch.optim.Optimizer, payload: dict) -> int:
-    """Restore model and optimizer exactly and return the next epoch index."""
+def resume_training(
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    payload: dict,
+    scheduler: torch.optim.lr_scheduler.LRScheduler | None = None,
+) -> int:
+    """Restore model, optimizer, and configured scheduler exactly."""
     if "optimizer" not in payload or "epoch" not in payload:
         raise ValueError("resume checkpoint must contain optimizer and epoch")
+    if scheduler is not None and not isinstance(payload.get("scheduler"), dict):
+        raise ValueError("resume checkpoint must contain configured scheduler state")
     model.load_state_dict(payload["state_dict"], strict=True)
     optimizer.load_state_dict(payload["optimizer"])
+    if scheduler is not None:
+        scheduler.load_state_dict(payload["scheduler"])
     return int(payload["epoch"]) + 1

@@ -10,7 +10,9 @@ Research on four-source separation (vocals, drums, bass, other) and low-precisio
 
 ## Architecture
 
-A configurable joint TFC-TDF U-Net predicts four complex source spectrograms. An additive mixture-consistency projection is applied before FP32 iSTFT. Per-layer deployment precision can be FP32, ternary, W4A8, or W8A8. Quantization-aware layers retain latent FP32 weights and use fake-quantized weights and symmetric INT8 activations in forward passes. Projections, norms, STFT/iSTFT, and reconstruction remain FP32 by default.
+A configurable joint TFC-TDF U-Net predicts either four direct complex source spectrograms or four stereo complex masks. Direct estimate is the default and preserves existing checkpoint behavior. Complex-mask mode bounds the real and imaginary mask components independently with `tanh`, then multiplies the resulting complex mask by the retained mixture spectrogram. This smooth Cartesian bound avoids unbounded complex ratio masks while retaining phase rotation. Frequency padding, final estimate construction, additive mixture consistency, and iSTFT remain FP32; both modes preserve exact waveform mixture consistency within the frozen numerical tolerance.
+
+Per-layer deployment precision can be FP32, ternary, W4A8, or W8A8. Quantization-aware layers retain latent FP32 weights and use fake-quantized weights and symmetric INT8 activations in forward passes. Projections, norms, STFT/iSTFT, and reconstruction remain FP32 by default.
 
 ## Training and evaluation
 
@@ -18,13 +20,14 @@ The benchmark contract uses MUSDB18-HQ and the frozen 86/14 development split in
 
 The first recorded remote smoke experiment is under `results/remote/2026-07-17-selective-ternary/`. Its 632,208-parameter FP warm-up remained at -3.5326 dB validation diagnostic `global_sdr`. Matched ten-epoch continuations reached -3.1445 dB for FP32 and -3.1669 dB when TDF Linear and bottleneck convolution families used selective ternary QAT. The -0.0224 dB difference is evidence for reduced-task QAT recovery only. It is not museval/BSSEval and the negative absolute diagnostic confirms that this is not a useful released separator.
 
-The official MUSDB test set has not been evaluated.
+The official MUSDB test set has not been evaluated. Future training records emit explicitly labeled development-only overall/per-stem `global_sdr`, per-stem waveform L1, and a trivial equal-share (`mixture / 4`) baseline. These are not museval/BSSEval. No music-data result exists yet for complex-mask mode or the stronger matched FP32 configurations.
 
 ## Limitations
 
 - No quality-qualified or published checkpoint exists.
 - The FP architecture/training recipe requires substantial improvement before quantization quality gates can be evaluated.
-- The remote smoke record omitted GPU identity and PyTorch/CUDA versions.
+- The historical remote smoke record omitted GPU identity and PyTorch/CUDA versions; the updated recorder cannot retroactively supply them and leaves missing values unknown.
+- Direct-estimate versus complex-mask quality has not yet been measured on music data.
 - Native packed ternary kernels exist, but all-ternary deployment failed the interim optimized INT8 comparison.
 - Native W4/W8 operators and end-to-end mixed-precision runtime integration are incomplete.
 - No end-to-end model latency claim exists.

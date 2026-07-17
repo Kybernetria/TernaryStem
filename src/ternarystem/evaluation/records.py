@@ -8,7 +8,10 @@ import os
 import platform
 import subprocess
 from datetime import datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
+
+import torch
 
 from ternarystem.data import split_hash
 
@@ -28,10 +31,25 @@ def sha256(path: str | Path) -> str:
     return digest.hexdigest()
 
 
-def base_record(config: dict, seed: int) -> dict:
+def _package_version(name: str) -> str | None:
+    try:
+        return version(name)
+    except PackageNotFoundError:
+        return None
+
+
+def base_record(config: dict, seed: int, device: str | None = None) -> dict:
     status = _git("status", "--porcelain")
+    cuda_available = torch.cuda.is_available()
+    gpu_model = None
+    if cuda_available:
+        try:
+            gpu_device = device if device is not None and device.startswith("cuda") else None
+            gpu_model = torch.cuda.get_device_name(gpu_device)
+        except (AssertionError, RuntimeError, ValueError):
+            gpu_model = None
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": _git("rev-parse", "HEAD"),
         "git_dirty": None if status is None else bool(status),
@@ -44,10 +62,23 @@ def base_record(config: dict, seed: int) -> dict:
             "processor": platform.processor(),
             "python": platform.python_version(),
             "cpu_count": os.cpu_count(),
+            "device": device,
+            "cuda_available": cuda_available,
+            "gpu_model": gpu_model,
+        },
+        "software": {
+            "pytorch": torch.__version__,
+            "cuda": torch.version.cuda,
+            "numpy": _package_version("numpy"),
+            "soundfile": _package_version("soundfile"),
+            "pyyaml": _package_version("PyYAML"),
+            "musdb": _package_version("musdb"),
+            "museval": _package_version("museval"),
         },
         "quality": None,
         "runtime": None,
         "checkpoint_sha256": None,
+        "checkpoint_hashes": {"latest": None, "best": None},
         "packed_model_sha256": None,
     }
 

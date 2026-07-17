@@ -40,7 +40,7 @@ python scripts/train.py --config configs/experiment.yaml \
   --data-root /datasets/MUSDB18-HQ/train --output-dir runs/baseline
 ```
 
-Runs save resumable `latest.pt` and structured `experiment.json` artifacts. Precision is selected under `quant.layer_precisions` by layer family or exact module path. Reduced remote smoke configurations are available in `configs/smoke/`; input/output projections and FP32 reconstruction boundaries remain FP32 unless explicitly overridden.
+Runs save resumable `latest.pt` and structured `experiment.json` artifacts. Validation records explicitly labeled development `global_sdr`/L1 by stem and an equal-share baseline; these are not BSSEval. Precision is selected under `quant.layer_precisions` by layer family or exact module path. Reduced remote smoke configurations are available in `configs/smoke/`. Matched longer direct-estimate and bounded complex-mask FP32 configurations are in `configs/remote/`; input/output projections and FP32 reconstruction boundaries remain FP32 unless explicitly overridden.
 
 Warm-start a QAT smoke run from the matched FP checkpoint with a fresh optimizer:
 
@@ -50,7 +50,7 @@ python scripts/train.py --config configs/smoke/mixed.yaml \
   --output-dir runs/mixed
 ```
 
-Use `--resume runs/mixed/latest.pt` only to restore the exact same configuration and optimizer after interruption.
+Use `--resume runs/mixed/latest.pt` only to restore the exact same configuration, optimizer, and scheduler after interruption.
 
 Run immediate development-split layer-family sensitivity diagnostics from an FP checkpoint with:
 
@@ -58,6 +58,14 @@ Run immediate development-split layer-family sensitivity diagnostics from an FP 
 python scripts/sensitivity.py model.pt --data-root /datasets/MUSDB18-HQ/train \
   --precision w4a8 --output runs/sensitivity-w4a8.json
 ```
+
+Compare one or more experiment records (best/final epoch, equal-share baseline, output mode, and FP32/QAT classification) with:
+
+```bash
+python scripts/compare_runs.py runs/direct/experiment.json runs/mask/experiment.json
+```
+
+All comparison values are development `global_sdr`, never BSSEval.
 
 Export weights into the deterministic mixed-precision packed format with:
 

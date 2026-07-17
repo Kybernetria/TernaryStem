@@ -12,7 +12,11 @@
 - Exact scalar packed-ternary and scalar INT8 GEMM references with CMake correctness tests.
 - Runtime-dispatched AVX2 packed-ternary and INT8 prototypes with exact vector-path tests.
 - Unit/integration tests, synthetic QAT probes, and a captured operator-shape inventory.
-- Streaming MUSDB chunk/remix augmentation, fixed validation chunks, best/latest checkpoints, exact optimizer/epoch resume, and separate FP-to-QAT warm-start loading with fresh optimizer state.
+- Streaming MUSDB chunk/remix augmentation, fixed validation chunks, best/latest checkpoints, exact optimizer/epoch/scheduler resume, and separate FP-to-QAT warm-start loading with fresh optimizer/scheduler state.
+- Development-only validation diagnostics now report overall and per-stem `global_sdr`, per-stem waveform L1, and the matched `mixture / 4` equal-share baseline. Records and console output label these diagnostics as not BSSEval.
+- Checkpoint-compatible output parameterization supports the original direct complex estimate and a bounded Cartesian complex mask applied to the retained mixture spectrogram. Both preserve FP32 reconstruction, frequency padding, source/stereo shapes, and waveform mixture consistency.
+- Matched long-run FP32 direct-estimate and complex-mask configurations use the same split, seed, model capacity, validation chunks, budget, and cosine learning-rate schedule.
+- Experiment schema v2 records the selected device, PyTorch/CUDA availability and versions, GPU model when available, relevant package versions, and post-write hashes for both latest and best checkpoints. A compact comparison command summarizes model versus equal-share, output mode, FP32/mixed precision, and best/final development diagnostics.
 - Reduced FP32, medium FP32, ternary-QAT, W4A8, W8A8, and mixed-precision remote configurations; all resolve successfully in local dry runs. Remote records now verify the larger 632,208-parameter configuration used in the first music-data experiment.
 - A development-split layer-family sensitivity command that records immediate diagnostic loss/global-SDR deltas, parameter coverage, quantization statistics, activation saturation, and resolved configurations. Ternary sensitivity has run on MUSDB development audio; W4/W8 sensitivity remains open.
 - Reproducible oneDNN/FBGEMM quantized Linear benchmark harness and recorded FBGEMM results.
@@ -26,7 +30,7 @@ Matched ten-epoch continuations from the same FP checkpoint reached -3.1445 dB f
 
 ## Verification in this environment
 
-C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (29 tests), and Ruff passes. All six remote configurations pass local model-construction dry runs. FP-to-QAT warm starts and exact model/optimizer/epoch resume pass synthetic unit tests; no remote checkpoint resume has been exercised yet. Python dependencies were installed in an isolated CPU-only virtual environment under `/tmp` with pip caching disabled, avoiding the home-directory quota.
+C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (39 tests), and Ruff passes. All six smoke configurations and both matched long-run FP32 output-mode configurations pass local model-construction dry runs. Direct/mask shape, reconstruction, backward, frequency-padding, mixture-consistency, legacy-checkpoint, scheduler-resume, diagnostic, comparison, and metadata tests pass. No remote checkpoint resume has been exercised yet. Python dependencies were installed in an isolated CPU-only virtual environment under `/tmp` with pip caching disabled, avoiding the home-directory quota.
 
 ## Open gates
 

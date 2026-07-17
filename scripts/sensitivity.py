@@ -144,7 +144,7 @@ resolved = {
     "batch_size": args.batch_size,
     "validation_tracks": validation_names,
 }
-record = base_record(resolved, seed)
+record = base_record(resolved, seed, args.device)
 record["checkpoint_sha256"] = sha256(args.checkpoint)
 record["sensitivity"] = {
     "evidence": "MUSDB18-HQ development-split immediate diagnostic; no QAT recovery",

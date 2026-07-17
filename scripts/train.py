@@ -14,10 +14,10 @@ from torch.utils.data import DataLoader
 
 from ternarystem.config import load_config, model_config
 from ternarystem.data import MUSDBChunkDataset, validate_track_names
-from ternarystem.evaluation import base_record, save_record, sha256
+from ternarystem.evaluation import DevelopmentDiagnostics, base_record, save_record, sha256
 from ternarystem.losses import complex_l1, global_sdr, multiresolution_stft_loss
 from ternarystem.models import Separator
-from ternarystem.training import load_checkpoint, resume_training, warm_start_model
+from ternarystem.training import build_scheduler, load_checkpoint, resume_training, warm_start_model
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", default="configs/experiment.yaml")
@@ -77,12 +77,15 @@ validation_loader = DataLoader(
 device = torch.device(args.device)
 model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=config["train"]["learning_rate"])
+scheduler = build_scheduler(optimizer, config["train"])
 start_epoch = 0
 checkpoint_payload = None
 missing_quantizer_keys: list[str] = []
 if args.resume:
     checkpoint_payload = load_checkpoint(args.resume, device)
-    start_epoch = resume_training(model, optimizer, checkpoint_payload)
+    if checkpoint_payload.get("resolved_config") != config:
+        raise ValueError("exact resume requires the checkpoint's resolved configuration")
+    start_epoch = resume_training(model, optimizer, checkpoint_payload, scheduler)
 elif args.init_checkpoint:
     checkpoint_payload = load_checkpoint(args.init_checkpoint, device)
     missing_quantizer_keys = warm_start_model(model, checkpoint_payload)
@@ -90,9 +93,9 @@ args.output_dir.mkdir(parents=True, exist_ok=True)
 record_path = args.output_dir / "experiment.json"
 if args.resume and record_path.is_file():
     record = json.loads(record_path.read_text(encoding="utf-8"))
-    record.setdefault("resume_events", []).append(base_record(config, config["seed"]))
+    record.setdefault("resume_events", []).append(base_record(config, config["seed"], args.device))
 else:
-    record = base_record(config, config["seed"])
+    record = base_record(config, config["seed"], args.device)
     record["training"] = (
         list(checkpoint_payload.get("training_history", []))
         if args.resume and checkpoint_payload is not None
@@ -140,17 +143,23 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     metrics = {key: value / max(1, batches) for key, value in sums.items()}
     metrics["epoch"] = epoch
     model.eval()
-    validation_sdr = validation_l1 = 0.0
-    validation_batches = 0
+    diagnostics = DevelopmentDiagnostics(model_cfg.sources)
     with torch.inference_mode():
         for mixture, targets in validation_loader:
             mixture, targets = mixture.to(device), targets.to(device)
             estimates = model(mixture)
-            validation_l1 += float(F.l1_loss(estimates, targets))
-            validation_sdr += float(global_sdr(estimates, targets))
-            validation_batches += 1
-    metrics["validation_waveform_l1"] = validation_l1 / max(1, validation_batches)
-    metrics["validation_global_sdr"] = validation_sdr / max(1, validation_batches)
+            diagnostics.update(estimates, targets, mixture)
+    development = diagnostics.compute()
+    metrics["validation_development_diagnostics"] = development
+    # Preserve these flat names for existing records and best-checkpoint selection.
+    metrics["validation_waveform_l1"] = sum(
+        development["per_stem_waveform_l1"].values()
+    ) / model_cfg.sources
+    metrics["validation_global_sdr"] = development["global_sdr"]
+    metrics["learning_rate"] = optimizer.param_groups[0]["lr"]
+    if scheduler is not None:
+        scheduler.step()
+    metrics["next_learning_rate"] = optimizer.param_groups[0]["lr"]
     record["training"].append(metrics)
     checkpoint = {
         "config": asdict(model_cfg),
@@ -158,14 +167,20 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         "epoch": epoch,
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
+        "scheduler": scheduler.state_dict() if scheduler is not None else None,
         "metrics": metrics,
         "training_history": record["training"],
     }
-    torch.save(checkpoint, args.output_dir / "latest.pt")
+    latest_path = args.output_dir / "latest.pt"
+    best_path = args.output_dir / "best.pt"
+    torch.save(checkpoint, latest_path)
     previous = record["training"][:-1]
     if not previous or metrics["validation_global_sdr"] > max(
         item["validation_global_sdr"] for item in previous
     ):
-        torch.save(checkpoint, args.output_dir / "best.pt")
+        torch.save(checkpoint, best_path)
+    record.setdefault("checkpoint_hashes", {})["latest"] = sha256(latest_path)
+    record["checkpoint_hashes"]["best"] = sha256(best_path) if best_path.is_file() else None
+    record["checkpoint_sha256"] = record["checkpoint_hashes"]["latest"]
     save_record(record_path, record)
     print(json.dumps(metrics))

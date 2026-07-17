@@ -42,6 +42,9 @@ class SeparatorConfig:
     ternary_method: str = "adaptive"
     w4_group_size: int | None = 32
     activation_method: str = "ema"
+    # ``direct_estimate`` preserves the original checkpoint behavior. ``complex_mask``
+    # bounds real and imaginary mask components with tanh before complex multiplication.
+    output_parameterization: str = "direct_estimate"
 
     def precision_for(self, family: str, path: str) -> str:
         precision = self.layer_precisions.get(path, self.layer_precisions.get(family, "fp32"))
@@ -146,6 +149,8 @@ class TFCTDFUNet(nn.Module):
         super().__init__()
         if not config.channels or config.frequency_bins > config.n_fft // 2 + 1:
             raise ValueError("invalid channels or frequency truncation")
+        if config.output_parameterization not in {"direct_estimate", "complex_mask"}:
+            raise ValueError(f"invalid output parameterization: {config.output_parameterization!r}")
         unknown = set(config.layer_precisions) - LAYER_FAMILIES
         exact_boundary_paths = {"input_projection", "output_projection"}
         # Other exact module paths contain a dot; reject likely misspelled family keys.
@@ -226,10 +231,20 @@ class Separator(nn.Module):
         self.network = TFCTDFUNet(config)
 
     def spectrograms(self, waveform: Tensor) -> Tensor:
-        mixture = self.stft.analysis(waveform.float())
+        # STFT, output parameterization, padding, and consistency are explicit FP32
+        # boundaries even when the core is run under mixed-precision autocast.
+        mixture = self.stft.analysis(waveform.float()).to(torch.complex64)
         kept = mixture[..., : self.config.frequency_bins, :]
         parts = torch.view_as_real(kept).permute(0, 1, 4, 2, 3).flatten(1, 2)
-        estimates = self.network(parts)
+        raw = self.network(parts)
+        raw = torch.complex(raw.real.float(), raw.imag.float())
+        if self.config.output_parameterization == "complex_mask":
+            # Separately bounded Cartesian components avoid unbounded ratio masks while
+            # retaining phase rotation and a smooth gradient everywhere.
+            masks = torch.complex(torch.tanh(raw.real), torch.tanh(raw.imag))
+            estimates = masks * kept.unsqueeze(1)
+        else:
+            estimates = raw
         if self.config.frequency_bins < mixture.shape[-2]:
             estimates = F.pad(estimates, (0, 0, 0, mixture.shape[-2] - self.config.frequency_bins))
         return mixture_consistency(estimates, mixture)

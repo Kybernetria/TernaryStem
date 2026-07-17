@@ -11,7 +11,7 @@ Consequently, development proceeds on two tracks:
 1. Continue ternary QAT as a quality research question.
 2. Use selective per-layer deployment: BitNet I2_S only for shapes where it wins, W4A8/W8A8 for the remaining quantized core, and FP32 for sensitive boundaries/norms.
 
-No end-to-end latency or separation-quality claim has been established. A first remote MUSDB18-HQ development smoke run and matched continuation are recorded in `results/remote/2026-07-17-selective-ternary/`: selective TDF/bottleneck ternary QAT trailed its FP32 control by 0.0224 dB on diagnostic `global_sdr`, but the FP model itself remained at negative SDR and poor separation quality. This supports recoverable selective-QAT plumbing, not Gate 1 or Gate 2. The next decisive milestone is a capable FP32 music-separation baseline, followed by matched W4A8/W8A8 and mixed-precision runs.
+No end-to-end latency or separation-quality claim has been established. A first remote MUSDB18-HQ development smoke run and matched continuation are recorded in `results/remote/2026-07-17-selective-ternary/`: selective TDF/bottleneck ternary QAT trailed its FP32 control by 0.0224 dB on diagnostic `global_sdr`, but the FP model itself remained at negative SDR and poor separation quality. This supports recoverable selective-QAT plumbing, not Gate 1 or Gate 2. The local training path now includes per-stem development diagnostics and an equal-share baseline, direct-estimate and bounded complex-mask output modes, resumable learning-rate scheduling, expanded environment/checkpoint metadata, and matched longer FP32 configurations. These additions have only synthetic/local test coverage; the next decisive milestone remains a capable remotely trained FP32 music-separation baseline, followed by matched W4A8/W8A8 and mixed-precision runs.
 
 ## 1. Objective
 
@@ -443,13 +443,14 @@ Use a local structured format as the source of truth; external tracking services
 
 ## 9. Immediate Next Actions
 
-1. Improve the FP architecture/training recipe until it produces meaningful development separation; the first remote smoke remained at negative diagnostic SDR.
-2. Repeat FP training with complete GPU/software metadata and retain resolved records/checkpoint hashes.
-3. Run W4A8 and W8A8 family sensitivity from the matched capable FP checkpoint, preserving projections in FP32.
-4. Repeat selective ternary QAT at 20%, 40%, and 60% zero targets and compare adaptive versus BitNet-style quantization only after the FP baseline is adequate.
-5. Train matched W4A8, W8A8, and mixed continuations selected by sensitivity, each with an equal-compute FP control.
-6. Train and profile the selected FP32 baseline before making broad deployment decisions.
-7. Add matched scale/bias/requantization to BitNet and FBGEMM comparisons and build per-shape selective dispatch.
-8. Implement and benchmark native offline-packed W4/W8 operator paths before making deployment-speed claims.
-9. Evaluate the best mixed-precision model against its matched FP32 checkpoint; do not touch the official test set until the recipe is frozen.
-10. Validate NEON economics on ARM hardware after x86 precision selection is stable.
+1. Run the matched long-budget direct-estimate and bounded complex-mask FP32 configurations remotely, and compare both against their equal-share development baselines; the first remote smoke remained at negative diagnostic SDR.
+2. Use the now-recorded GPU/software metadata and latest/best checkpoint hashes, and verify exact scheduler resume on the remote host before committing a long run.
+3. Improve the FP architecture/training recipe based on per-stem development diagnostics until it produces meaningful separation; do not begin expensive QAT from another incapable FP baseline.
+4. Run W4A8 and W8A8 family sensitivity from the matched capable FP checkpoint, preserving projections in FP32.
+5. Repeat selective ternary QAT at 20%, 40%, and 60% zero targets and compare adaptive versus BitNet-style quantization only after the FP baseline is adequate.
+6. Train matched W4A8, W8A8, and mixed continuations selected by sensitivity, each with an equal-compute FP control.
+7. Train and profile the selected FP32 baseline before making broad deployment decisions.
+8. Add matched scale/bias/requantization to BitNet and FBGEMM comparisons and build per-shape selective dispatch.
+9. Implement and benchmark native offline-packed W4/W8 operator paths before making deployment-speed claims.
+10. Evaluate the best mixed-precision model against its matched FP32 checkpoint; do not touch the official test set until the recipe is frozen.
+11. Validate NEON economics on ARM hardware after x86 precision selection is stable.

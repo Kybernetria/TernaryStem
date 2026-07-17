@@ -16,6 +16,16 @@ def test_remote_smoke_configs_resolve_with_fp32_boundaries(name):
     assert resolved.precision_for("projections", "output_projection") == "fp32"
 
 
+def test_matched_remote_fp32_configs_only_differ_in_output_parameterization():
+    direct = load_config("configs/remote/fp32_direct.yaml")
+    mask = load_config("configs/remote/fp32_complex_mask.yaml")
+    direct_mode = direct["model"].pop("output_parameterization")
+    mask_mode = mask["model"].pop("output_parameterization")
+    assert direct_mode == "direct_estimate"
+    assert mask_mode == "complex_mask"
+    assert direct == mask
+
+
 def test_removed_global_quantized_flag_is_rejected():
     with pytest.raises(ValueError, match="layer_precisions"):
         model_config({"model": {"channels": [4], "quantized": True}})
