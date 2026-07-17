@@ -5,7 +5,9 @@ import pytest
 from ternarystem.config import load_config, model_config
 
 
-@pytest.mark.parametrize("name", ["fp32", "ternary_qat", "w4a8", "w8a8", "mixed"])
+@pytest.mark.parametrize(
+    "name", ["fp32", "fp32_medium", "ternary_qat", "w4a8", "w8a8", "mixed"]
+)
 def test_remote_smoke_configs_resolve_with_fp32_boundaries(name):
     config = load_config(Path("configs/smoke") / f"{name}.yaml")
     resolved = model_config(config)

@@ -13,14 +13,14 @@
 - Runtime-dispatched AVX2 packed-ternary and INT8 prototypes with exact vector-path tests.
 - Unit/integration tests, synthetic QAT probes, and a captured operator-shape inventory.
 - Streaming MUSDB chunk/remix augmentation, fixed validation chunks, best/latest checkpoints, exact optimizer/epoch resume, and separate FP-to-QAT warm-start loading with fresh optimizer state.
-- Reduced FP32, ternary-QAT, W4A8, W8A8, and mixed-precision remote smoke configurations; all resolve successfully in local dry runs.
+- Reduced FP32, medium FP32, ternary-QAT, W4A8, W8A8, and mixed-precision remote configurations; all resolve successfully in local dry runs. The medium FP32 configuration has not yet been memory-tested on remote hardware.
 - A development-split layer-family sensitivity command that records immediate diagnostic loss/global-SDR deltas, parameter coverage, quantization statistics, activation saturation, and resolved configurations. It has not yet been run on MUSDB audio.
 - Reproducible oneDNN/FBGEMM quantized Linear benchmark harness and recorded FBGEMM results.
 - Optional exact BitNet.cpp I2_S benchmark adapter and matching exporter layout.
 
 ## Verification in this environment
 
-C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (28 tests), and Ruff passes. All five remote smoke configurations pass local model-construction dry runs. FP-to-QAT warm starts and exact model/optimizer/epoch resume pass synthetic unit tests; no remote checkpoint resume has been exercised yet. Python dependencies were installed in an isolated CPU-only virtual environment under `/tmp` with pip caching disabled, avoiding the home-directory quota.
+C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (28 tests), and Ruff passes. All six remote configurations pass local model-construction dry runs. FP-to-QAT warm starts and exact model/optimizer/epoch resume pass synthetic unit tests; no remote checkpoint resume has been exercised yet. Python dependencies were installed in an isolated CPU-only virtual environment under `/tmp` with pip caching disabled, avoiding the home-directory quota.
 
 ## Open gates
 
