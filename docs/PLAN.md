@@ -11,7 +11,7 @@ Consequently, development proceeds on two tracks:
 1. Continue ternary QAT as a quality research question.
 2. Use selective per-layer deployment: BitNet I2_S only for shapes where it wins, W4A8/W8A8 for the remaining quantized core, and FP32 for sensitive boundaries/norms.
 
-No end-to-end latency or separation-quality claim has been established. W4A8/W8A8 fake quantization, mixed per-layer precision selection, deterministic export, smoke configurations, and a layer-family sensitivity command are implemented and locally tested; they have not yet been evaluated on music. The next decisive milestone is a reduced FP32 music-separation training run followed by matched QAT and sensitivity runs on remote GPU hardware.
+No end-to-end latency or separation-quality claim has been established. W4A8/W8A8 fake quantization, mixed per-layer precision selection, deterministic export, smoke configurations, FP-to-QAT warm-start loading, exact checkpoint resume, and a layer-family sensitivity command are implemented and locally tested; they have not yet been evaluated on music. The next decisive milestone is a reduced FP32 music-separation training run followed by matched QAT and sensitivity runs on remote GPU hardware.
 
 ## 1. Objective
 

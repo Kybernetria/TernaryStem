@@ -42,6 +42,16 @@ python scripts/train.py --config configs/experiment.yaml \
 
 Runs save resumable `latest.pt` and structured `experiment.json` artifacts. Precision is selected under `quant.layer_precisions` by layer family or exact module path. Reduced remote smoke configurations are available in `configs/smoke/`; input/output projections and FP32 reconstruction boundaries remain FP32 unless explicitly overridden.
 
+Warm-start a QAT smoke run from the matched FP checkpoint with a fresh optimizer:
+
+```bash
+python scripts/train.py --config configs/smoke/mixed.yaml \
+  --init-checkpoint runs/fp32/best.pt --data-root /datasets/MUSDB18-HQ/train \
+  --output-dir runs/mixed
+```
+
+Use `--resume runs/mixed/latest.pt` only to restore the exact same configuration and optimizer after interruption.
+
 Run immediate development-split layer-family sensitivity diagnostics from an FP checkpoint with:
 
 ```bash

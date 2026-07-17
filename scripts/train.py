@@ -14,15 +14,20 @@ from torch.utils.data import DataLoader
 
 from ternarystem.config import load_config, model_config
 from ternarystem.data import MUSDBChunkDataset, validate_track_names
-from ternarystem.evaluation import base_record, save_record
+from ternarystem.evaluation import base_record, save_record, sha256
 from ternarystem.losses import complex_l1, global_sdr, multiresolution_stft_loss
 from ternarystem.models import Separator
+from ternarystem.training import load_checkpoint, resume_training, warm_start_model
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", default="configs/experiment.yaml")
 parser.add_argument("--data-root", type=Path, help="MUSDB18-HQ train directory")
 parser.add_argument("--output-dir", type=Path, default=Path("runs/default"))
-parser.add_argument("--resume", type=Path)
+checkpoint_group = parser.add_mutually_exclusive_group()
+checkpoint_group.add_argument("--resume", type=Path, help="restore an interrupted run exactly")
+checkpoint_group.add_argument(
+    "--init-checkpoint", type=Path, help="warm-start model weights with a fresh optimizer"
+)
 parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
 parser.add_argument("--workers", type=int, default=4)
 parser.add_argument("--dry-run", action="store_true")
@@ -73,14 +78,37 @@ device = torch.device(args.device)
 model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=config["train"]["learning_rate"])
 start_epoch = 0
+checkpoint_payload = None
+missing_quantizer_keys: list[str] = []
 if args.resume:
-    payload = torch.load(args.resume, map_location=device, weights_only=True)
-    model.load_state_dict(payload["state_dict"])
-    optimizer.load_state_dict(payload["optimizer"])
-    start_epoch = payload["epoch"] + 1
+    checkpoint_payload = load_checkpoint(args.resume, device)
+    start_epoch = resume_training(model, optimizer, checkpoint_payload)
+elif args.init_checkpoint:
+    checkpoint_payload = load_checkpoint(args.init_checkpoint, device)
+    missing_quantizer_keys = warm_start_model(model, checkpoint_payload)
 args.output_dir.mkdir(parents=True, exist_ok=True)
-record = base_record(config, config["seed"])
-record["training"] = []
+record_path = args.output_dir / "experiment.json"
+if args.resume and record_path.is_file():
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    record.setdefault("resume_events", []).append(base_record(config, config["seed"]))
+else:
+    record = base_record(config, config["seed"])
+    record["training"] = (
+        list(checkpoint_payload.get("training_history", []))
+        if args.resume and checkpoint_payload is not None
+        else []
+    )
+record["initialization"] = {
+    "mode": "resume" if args.resume else "warm_start" if args.init_checkpoint else "scratch",
+    "checkpoint": str(args.resume or args.init_checkpoint)
+    if args.resume or args.init_checkpoint
+    else None,
+    "checkpoint_sha256": sha256(args.resume or args.init_checkpoint)
+    if args.resume or args.init_checkpoint
+    else None,
+    "missing_quantizer_state": missing_quantizer_keys,
+    "start_epoch": start_epoch,
+}
 weights = config["train"]
 
 for epoch in range(start_epoch, config["train"]["epochs"]):
@@ -131,6 +159,7 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "metrics": metrics,
+        "training_history": record["training"],
     }
     torch.save(checkpoint, args.output_dir / "latest.pt")
     previous = record["training"][:-1]
@@ -138,5 +167,5 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         item["validation_global_sdr"] for item in previous
     ):
         torch.save(checkpoint, args.output_dir / "best.pt")
-    save_record(args.output_dir / "experiment.json", record)
+    save_record(record_path, record)
     print(json.dumps(metrics))
