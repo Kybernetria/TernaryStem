@@ -1,0 +1,183 @@
+{
+  "checkpoint_sha256": null,
+  "config": {
+    "data": {
+      "chunk_seconds": 6.0,
+      "epoch_chunks": 256,
+      "sample_rate": 44100,
+      "validation_chunks": 56
+    },
+    "model": {
+      "channels": [
+        24,
+        48,
+        96
+      ],
+      "frequency_bins": 1024,
+      "hop_length": 1024,
+      "n_fft": 4096,
+      "tdf_bottleneck": 16
+    },
+    "quant": {
+      "activation_bits": 8,
+      "activation_method": "ema",
+      "layer_precisions": {
+        "bottleneck_conv": "ternary",
+        "tdf_linear": "ternary"
+      },
+      "target_zero_ratio": 0.4,
+      "threshold": "adaptive"
+    },
+    "seed": 20250218,
+    "train": {
+      "batch_size": 4,
+      "complex_l1": 1.0,
+      "epochs": 10,
+      "learning_rate": 0.0001,
+      "multires_stft": 0.25,
+      "waveform_l1": 1.0
+    }
+  },
+  "created_utc": "2026-07-17T19:37:11.196660+00:00",
+  "git_commit": "2b1890fe8dd00b54c7ffff47d819195672be242c",
+  "git_dirty": false,
+  "host": {
+    "cpu_count": 2,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+    "processor": "x86_64",
+    "python": "3.12.13"
+  },
+  "initialization": {
+    "checkpoint": "/content/drive/MyDrive/ternarystem-runs/fp32-large/best.pt",
+    "checkpoint_sha256": "0967a01ba029d9b7520b931e60ae62b46707247cc55a6297095469dfbc310395",
+    "missing_quantizer_state": [
+      "network.encoder.0.1.tdf.layers.0.activation_quant.range",
+      "network.encoder.0.1.tdf.layers.0.activation_quant.saturation_rate",
+      "network.encoder.0.1.tdf.layers.2.activation_quant.range",
+      "network.encoder.0.1.tdf.layers.2.activation_quant.saturation_rate",
+      "network.encoder.1.1.tdf.layers.0.activation_quant.range",
+      "network.encoder.1.1.tdf.layers.0.activation_quant.saturation_rate",
+      "network.encoder.1.1.tdf.layers.2.activation_quant.range",
+      "network.encoder.1.1.tdf.layers.2.activation_quant.saturation_rate",
+      "network.encoder.2.0.activation_quant.range",
+      "network.encoder.2.0.activation_quant.saturation_rate",
+      "network.encoder.2.1.tfc.layers.0.activation_quant.range",
+      "network.encoder.2.1.tfc.layers.0.activation_quant.saturation_rate",
+      "network.encoder.2.1.tfc.layers.3.activation_quant.range",
+      "network.encoder.2.1.tfc.layers.3.activation_quant.saturation_rate",
+      "network.encoder.2.1.tdf.layers.0.activation_quant.range",
+      "network.encoder.2.1.tdf.layers.0.activation_quant.saturation_rate",
+      "network.encoder.2.1.tdf.layers.2.activation_quant.range",
+      "network.encoder.2.1.tdf.layers.2.activation_quant.saturation_rate",
+      "network.decoder.0.1.tdf.layers.0.activation_quant.range",
+      "network.decoder.0.1.tdf.layers.0.activation_quant.saturation_rate",
+      "network.decoder.0.1.tdf.layers.2.activation_quant.range",
+      "network.decoder.0.1.tdf.layers.2.activation_quant.saturation_rate",
+      "network.decoder.1.1.tdf.layers.0.activation_quant.range",
+      "network.decoder.1.1.tdf.layers.0.activation_quant.saturation_rate",
+      "network.decoder.1.1.tdf.layers.2.activation_quant.range",
+      "network.decoder.1.1.tdf.layers.2.activation_quant.saturation_rate"
+    ],
+    "mode": "warm_start",
+    "start_epoch": 0
+  },
+  "packed_model_sha256": null,
+  "quality": null,
+  "runtime": null,
+  "schema_version": 1,
+  "seed": 20250218,
+  "split_sha256": "d4111b45f8b03291b88e9ed2aabe176696d26ed6133947e318de6882b30bd41f",
+  "training": [
+    {
+      "complex_l1": 0.20143627002835274,
+      "epoch": 0,
+      "loss": 0.26566126802936196,
+      "sdr": -3.854514022357762,
+      "validation_global_sdr": -3.591272773487227,
+      "validation_waveform_l1": 0.030588505124407157,
+      "waveform_l1": 0.028970222003408708
+    },
+    {
+      "complex_l1": 0.2045598798431456,
+      "epoch": 1,
+      "loss": 0.2694459285121411,
+      "sdr": -5.043214892037213,
+      "validation_global_sdr": -3.5438646972179413,
+      "validation_waveform_l1": 0.030500064603984356,
+      "waveform_l1": 0.02905190410092473
+    },
+    {
+      "complex_l1": 0.1985651480499655,
+      "epoch": 2,
+      "loss": 0.26186156226322055,
+      "sdr": -4.668424550443888,
+      "validation_global_sdr": -3.4863859500203813,
+      "validation_waveform_l1": 0.02998411948127406,
+      "waveform_l1": 0.028536600817460567
+    },
+    {
+      "complex_l1": 0.19647507485933602,
+      "epoch": 3,
+      "loss": 0.25895279832184315,
+      "sdr": -4.840043192729354,
+      "validation_global_sdr": -3.3768238936151778,
+      "validation_waveform_l1": 0.029775262411151613,
+      "waveform_l1": 0.028222349763382226
+    },
+    {
+      "complex_l1": 0.1881273341132328,
+      "epoch": 4,
+      "loss": 0.2478664293885231,
+      "sdr": -3.572301530279219,
+      "validation_global_sdr": -3.3424603513308933,
+      "validation_waveform_l1": 0.029732512709285532,
+      "waveform_l1": 0.02715878249728121
+    },
+    {
+      "complex_l1": 0.19268549443222582,
+      "epoch": 5,
+      "loss": 0.25342961959540844,
+      "sdr": -4.969143558293581,
+      "validation_global_sdr": -3.2726667438234602,
+      "validation_waveform_l1": 0.029691611150545732,
+      "waveform_l1": 0.027409208298195153
+    },
+    {
+      "complex_l1": 0.19949887844268233,
+      "epoch": 6,
+      "loss": 0.26230275840498507,
+      "sdr": -3.7714084535837173,
+      "validation_global_sdr": -3.333539162363325,
+      "validation_waveform_l1": 0.02995692738997085,
+      "waveform_l1": 0.02826000371715054
+    },
+    {
+      "complex_l1": 0.19896619278006256,
+      "epoch": 7,
+      "loss": 0.2618176821852103,
+      "sdr": -3.7588230399414897,
+      "validation_global_sdr": -3.1690104263169423,
+      "validation_waveform_l1": 0.029185776465705464,
+      "waveform_l1": 0.02843306743307039
+    },
+    {
+      "complex_l1": 0.20327207259833813,
+      "epoch": 8,
+      "loss": 0.2671906149480492,
+      "sdr": -2.8215828062966466,
+      "validation_global_sdr": -3.1809418371745517,
+      "validation_waveform_l1": 0.02923963830939361,
+      "waveform_l1": 0.02906028032884933
+    },
+    {
+      "complex_l1": 0.19069415074773133,
+      "epoch": 9,
+      "loss": 0.2503040989395231,
+      "sdr": -3.611158335581422,
+      "validation_global_sdr": -3.166944078036717,
+      "validation_waveform_l1": 0.029207178790654455,
+      "waveform_l1": 0.026789225463289768
+    }
+  ]
+}

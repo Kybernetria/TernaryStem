@@ -11,7 +11,7 @@ Consequently, development proceeds on two tracks:
 1. Continue ternary QAT as a quality research question.
 2. Use selective per-layer deployment: BitNet I2_S only for shapes where it wins, W4A8/W8A8 for the remaining quantized core, and FP32 for sensitive boundaries/norms.
 
-No end-to-end latency or separation-quality claim has been established. W4A8/W8A8 fake quantization, mixed per-layer precision selection, deterministic export, smoke configurations, FP-to-QAT warm-start loading, exact checkpoint resume, and a layer-family sensitivity command are implemented and locally tested; they have not yet been evaluated on music. The next decisive milestone is a reduced FP32 music-separation training run followed by matched QAT and sensitivity runs on remote GPU hardware.
+No end-to-end latency or separation-quality claim has been established. A first remote MUSDB18-HQ development smoke run and matched continuation are recorded in `results/remote/2026-07-17-selective-ternary/`: selective TDF/bottleneck ternary QAT trailed its FP32 control by 0.0224 dB on diagnostic `global_sdr`, but the FP model itself remained at negative SDR and poor separation quality. This supports recoverable selective-QAT plumbing, not Gate 1 or Gate 2. The next decisive milestone is a capable FP32 music-separation baseline, followed by matched W4A8/W8A8 and mixed-precision runs.
 
 ## 1. Objective
 
@@ -443,12 +443,12 @@ Use a local structured format as the source of truth; external tracking services
 
 ## 9. Immediate Next Actions
 
-1. Verify a remote MUSDB18-HQ installation against the frozen 86/14 split and record its split hash.
-2. Run the reduced FP32 smoke configuration; inspect generated stems and require decreasing loss, improving validation global SDR, and successful checkpoint resume.
-3. Train and profile the selected FP32 baseline before broad quantization.
-4. Run the implemented ternary, W4A8, W8A8, and mixed smoke configurations from the matched FP checkpoint.
-5. Execute the implemented layer-family sensitivity command for TDF, bottleneck, encoder, decoder, and projection families; use its development diagnostics to select precision, without treating immediate deltas as recovered QAT quality.
-6. Warm-start adaptive and BitNet-style ternary QAT from the FP32 checkpoint at 20%, 40%, and 60% zero targets.
+1. Improve the FP architecture/training recipe until it produces meaningful development separation; the first remote smoke remained at negative diagnostic SDR.
+2. Repeat FP training with complete GPU/software metadata and retain resolved records/checkpoint hashes.
+3. Run W4A8 and W8A8 family sensitivity from the matched capable FP checkpoint, preserving projections in FP32.
+4. Repeat selective ternary QAT at 20%, 40%, and 60% zero targets and compare adaptive versus BitNet-style quantization only after the FP baseline is adequate.
+5. Train matched W4A8, W8A8, and mixed continuations selected by sensitivity, each with an equal-compute FP control.
+6. Train and profile the selected FP32 baseline before making broad deployment decisions.
 7. Add matched scale/bias/requantization to BitNet and FBGEMM comparisons and build per-shape selective dispatch.
 8. Implement and benchmark native offline-packed W4/W8 operator paths before making deployment-speed claims.
 9. Evaluate the best mixed-precision model against its matched FP32 checkpoint; do not touch the official test set until the recipe is frozen.

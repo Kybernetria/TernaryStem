@@ -1,0 +1,573 @@
+{
+  "checkpoint_sha256": "0967a01ba029d9b7520b931e60ae62b46707247cc55a6297095469dfbc310395",
+  "config": {
+    "batch_size": 2,
+    "checkpoint_config": {
+      "activation_method": "ema",
+      "channels": [
+        24,
+        48,
+        96
+      ],
+      "frequency_bins": 1024,
+      "hop_length": 1024,
+      "layer_precisions": {},
+      "n_fft": 4096,
+      "sources": 4,
+      "tdf_bottleneck": 16,
+      "ternary_method": "adaptive",
+      "w4_group_size": 32,
+      "zero_ratio": 0.4
+    },
+    "chunks": 28,
+    "families": [
+      "bottleneck_conv",
+      "decoder_conv",
+      "encoder_conv",
+      "projections",
+      "tdf_linear"
+    ],
+    "precision": "ternary",
+    "validation_tracks": [
+      "Actions - One Minute Smile",
+      "Clara Berry And Wooldog - Waltz For My Victims",
+      "Johnny Lokke - Promises & Lies",
+      "Patrick Talbot - A Reason To Leave",
+      "Triviul - Angelsaint",
+      "Alexander Ross - Goodbye Bolero",
+      "Fergessen - Nos Palpitants",
+      "Leaf - Summerghost",
+      "Skelpolu - Human Mistakes",
+      "Young Griffo - Pennies",
+      "ANiMAL - Rockshow",
+      "James May - On The Line",
+      "Meaxic - Take A Step",
+      "Traffic Experiment - Sirens"
+    ]
+  },
+  "created_utc": "2026-07-17T19:34:41.438041+00:00",
+  "git_commit": "2b1890fe8dd00b54c7ffff47d819195672be242c",
+  "git_dirty": false,
+  "host": {
+    "cpu_count": 2,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+    "processor": "x86_64",
+    "python": "3.12.13"
+  },
+  "packed_model_sha256": null,
+  "quality": null,
+  "runtime": null,
+  "schema_version": 1,
+  "seed": 20250218,
+  "sensitivity": {
+    "baseline": {
+      "complex_l1": 0.24439893130745208,
+      "diagnostic_loss": 0.2776159330138138,
+      "global_sdr": -2.573274382523128,
+      "waveform_l1": 0.03321700330291476
+    },
+    "eligible_weight_parameters": 620320,
+    "evidence": "MUSDB18-HQ development-split immediate diagnostic; no QAT recovery",
+    "families": [
+      {
+        "activation_saturation": {
+          "network.encoder.2.0": 0.0046329498291015625,
+          "network.encoder.2.1.tfc.layers.0": 3.814697265625e-05,
+          "network.encoder.2.1.tfc.layers.3": 0.0007902781362645328
+        },
+        "coverage_of_all_parameters": 0.2696833953382431,
+        "coverage_of_eligible": 0.2748516894506061,
+        "covered_parameters": 170496,
+        "delta": {
+          "complex_l1": 0.0030552617141178517,
+          "diagnostic_loss": 0.0034208127430507274,
+          "global_sdr": -0.1484862225396295,
+          "waveform_l1": 0.000365549698472023
+        },
+        "family": "bottleneck_conv",
+        "metrics": {
+          "complex_l1": 0.24745419302156993,
+          "diagnostic_loss": 0.28103674575686455,
+          "global_sdr": -2.7217606050627574,
+          "waveform_l1": 0.03358255300138678
+        },
+        "precision": "ternary",
+        "resolved_model_config": {
+          "activation_method": "ema",
+          "channels": [
+            24,
+            48,
+            96
+          ],
+          "frequency_bins": 1024,
+          "hop_length": 1024,
+          "layer_precisions": {
+            "bottleneck_conv": "ternary"
+          },
+          "n_fft": 4096,
+          "sources": 4,
+          "tdf_bottleneck": 16,
+          "ternary_method": "adaptive",
+          "w4_group_size": 32,
+          "zero_ratio": 0.4
+        },
+        "weight_statistics": [
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.2.0.weight",
+            "parameters": 4608,
+            "scale_max": 0.12423745542764664,
+            "scale_mean": 0.10316478461027145,
+            "scale_min": 0.08109842240810394,
+            "zero_fraction": 0.3958333432674408
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.2.1.tfc.layers.0.weight",
+            "parameters": 82944,
+            "scale_max": 0.04219282791018486,
+            "scale_mean": 0.029866067692637444,
+            "scale_min": 0.02539237216114998,
+            "zero_fraction": 0.40046295523643494
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.2.1.tfc.layers.3.weight",
+            "parameters": 82944,
+            "scale_max": 0.03484717011451721,
+            "scale_mean": 0.028918614611029625,
+            "scale_min": 0.024565070867538452,
+            "zero_fraction": 0.40046295523643494
+          }
+        ]
+      },
+      {
+        "activation_saturation": {
+          "network.decoder.0.0": 0.005111129488795996,
+          "network.decoder.0.1.tfc.layers.0": 0.0036248890683054924,
+          "network.decoder.0.1.tfc.layers.3": 0.0002651165414135903,
+          "network.decoder.1.0": 0.0100531792268157,
+          "network.decoder.1.1.tfc.layers.0": 0.004854848142713308,
+          "network.decoder.1.1.tfc.layers.3": 0.00035175730590708554
+        },
+        "coverage_of_all_parameters": 0.09566471794093083,
+        "coverage_of_eligible": 0.09749806551457313,
+        "covered_parameters": 60480,
+        "delta": {
+          "complex_l1": 0.11908319911786489,
+          "diagnostic_loss": 0.12538101790206774,
+          "global_sdr": -1.934392430952617,
+          "waveform_l1": 0.006297817320695946
+        },
+        "family": "decoder_conv",
+        "metrics": {
+          "complex_l1": 0.36348213042531696,
+          "diagnostic_loss": 0.40299695091588156,
+          "global_sdr": -4.507666813475745,
+          "waveform_l1": 0.039514820623610704
+        },
+        "precision": "ternary",
+        "resolved_model_config": {
+          "activation_method": "ema",
+          "channels": [
+            24,
+            48,
+            96
+          ],
+          "frequency_bins": 1024,
+          "hop_length": 1024,
+          "layer_precisions": {
+            "decoder_conv": "ternary"
+          },
+          "n_fft": 4096,
+          "sources": 4,
+          "tdf_bottleneck": 16,
+          "ternary_method": "adaptive",
+          "w4_group_size": 32,
+          "zero_ratio": 0.4
+        },
+        "weight_statistics": [
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.0.0.weight",
+            "parameters": 6912,
+            "scale_max": 0.10407225787639618,
+            "scale_mean": 0.06802458316087723,
+            "scale_min": 0.051943834871053696,
+            "zero_fraction": 0.4027777910232544
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.0.1.tfc.layers.0.weight",
+            "parameters": 20736,
+            "scale_max": 0.0529123991727829,
+            "scale_mean": 0.03778999671339989,
+            "scale_min": 0.0345197394490242,
+            "zero_fraction": 0.40046295523643494
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.0.1.tfc.layers.3.weight",
+            "parameters": 20736,
+            "scale_max": 0.05517212674021721,
+            "scale_mean": 0.0365917906165123,
+            "scale_min": 0.03062782995402813,
+            "zero_fraction": 0.40046295523643494
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.1.0.weight",
+            "parameters": 1728,
+            "scale_max": 0.12981480360031128,
+            "scale_mean": 0.11100765317678452,
+            "scale_min": 0.07818810641765594,
+            "zero_fraction": 0.4027777910232544
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.1.1.tfc.layers.0.weight",
+            "parameters": 5184,
+            "scale_max": 0.05526408553123474,
+            "scale_mean": 0.04931125417351723,
+            "scale_min": 0.04452681913971901,
+            "zero_fraction": 0.4027777910232544
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.1.1.tfc.layers.3.weight",
+            "parameters": 5184,
+            "scale_max": 0.060714226216077805,
+            "scale_mean": 0.047542642802000046,
+            "scale_min": 0.036268021911382675,
+            "zero_fraction": 0.4027777910232544
+          }
+        ]
+      },
+      {
+        "activation_saturation": {
+          "network.encoder.0.1.tfc.layers.0": 0.021130967885255814,
+          "network.encoder.0.1.tfc.layers.3": 0.00016857328591868281,
+          "network.encoder.1.0": 0.008676771074533463,
+          "network.encoder.1.1.tfc.layers.0": 0.000695043767336756,
+          "network.encoder.1.1.tfc.layers.3": 4.179410098004155e-05
+        },
+        "coverage_of_all_parameters": 0.08382051476729177,
+        "coverage_of_eligible": 0.08542687645086407,
+        "covered_parameters": 52992,
+        "delta": {
+          "complex_l1": 0.022427853196859332,
+          "diagnostic_loss": 0.028309477759259127,
+          "global_sdr": -1.6618746604238237,
+          "waveform_l1": 0.005881622699754577
+        },
+        "family": "encoder_conv",
+        "metrics": {
+          "complex_l1": 0.2668267845043114,
+          "diagnostic_loss": 0.30592541077307295,
+          "global_sdr": -4.235149042946952,
+          "waveform_l1": 0.039098626002669334
+        },
+        "precision": "ternary",
+        "resolved_model_config": {
+          "activation_method": "ema",
+          "channels": [
+            24,
+            48,
+            96
+          ],
+          "frequency_bins": 1024,
+          "hop_length": 1024,
+          "layer_precisions": {
+            "encoder_conv": "ternary"
+          },
+          "n_fft": 4096,
+          "sources": 4,
+          "tdf_bottleneck": 16,
+          "ternary_method": "adaptive",
+          "w4_group_size": 32,
+          "zero_ratio": 0.4
+        },
+        "weight_statistics": [
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.0.1.tfc.layers.0.weight",
+            "parameters": 5184,
+            "scale_max": 0.07239241153001785,
+            "scale_mean": 0.0505015105009079,
+            "scale_min": 0.0439135804772377,
+            "zero_fraction": 0.4027777910232544
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.0.1.tfc.layers.3.weight",
+            "parameters": 5184,
+            "scale_max": 0.055548045784235,
+            "scale_mean": 0.04859961196780205,
+            "scale_min": 0.043885502964258194,
+            "zero_fraction": 0.4027777910232544
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.1.0.weight",
+            "parameters": 1152,
+            "scale_max": 0.1792667806148529,
+            "scale_mean": 0.14405705034732819,
+            "scale_min": 0.10914617031812668,
+            "zero_fraction": 0.4166666567325592
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.1.1.tfc.layers.0.weight",
+            "parameters": 20736,
+            "scale_max": 0.04937325045466423,
+            "scale_mean": 0.03809989616274834,
+            "scale_min": 0.03336787596344948,
+            "zero_fraction": 0.40046295523643494
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.1.1.tfc.layers.3.weight",
+            "parameters": 20736,
+            "scale_max": 0.04615519195795059,
+            "scale_mean": 0.03815777972340584,
+            "scale_min": 0.03418412432074547,
+            "zero_fraction": 0.40046295523643494
+          }
+        ]
+      },
+      {
+        "activation_saturation": {
+          "network.input_projection": 0.03699013218283653,
+          "network.output_projection": 0.010988370515406132
+        },
+        "coverage_of_all_parameters": 0.0007592437931819907,
+        "coverage_of_eligible": 0.0007737941707505803,
+        "covered_parameters": 480,
+        "delta": {
+          "complex_l1": 0.09409961210829867,
+          "diagnostic_loss": 0.10193571927292006,
+          "global_sdr": -2.2780813766377315,
+          "waveform_l1": 0.007836104237607548
+        },
+        "family": "projections",
+        "metrics": {
+          "complex_l1": 0.33849854341575075,
+          "diagnostic_loss": 0.3795516522867339,
+          "global_sdr": -4.851355759160859,
+          "waveform_l1": 0.041053107540522306
+        },
+        "precision": "ternary",
+        "resolved_model_config": {
+          "activation_method": "ema",
+          "channels": [
+            24,
+            48,
+            96
+          ],
+          "frequency_bins": 1024,
+          "hop_length": 1024,
+          "layer_precisions": {
+            "projections": "ternary"
+          },
+          "n_fft": 4096,
+          "sources": 4,
+          "tdf_bottleneck": 16,
+          "ternary_method": "adaptive",
+          "w4_group_size": 32,
+          "zero_ratio": 0.4
+        },
+        "weight_statistics": [
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.input_projection.weight",
+            "parameters": 96,
+            "scale_max": 0.5295608043670654,
+            "scale_mean": 0.41467082500457764,
+            "scale_min": 0.15997040271759033,
+            "zero_fraction": 0.5
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.output_projection.weight",
+            "parameters": 384,
+            "scale_max": 0.2318713366985321,
+            "scale_mean": 0.19525107741355896,
+            "scale_min": 0.16401168704032898,
+            "zero_fraction": 0.4166666567325592
+          }
+        ]
+      },
+      {
+        "activation_saturation": {
+          "network.decoder.0.1.tdf.layers.0": 0.005462883040308952,
+          "network.decoder.0.1.tdf.layers.2": 0.0,
+          "network.decoder.1.1.tdf.layers.0": 0.0043906038627028465,
+          "network.decoder.1.1.tdf.layers.2": 0.0,
+          "network.encoder.0.1.tdf.layers.0": 0.004499319940805435,
+          "network.encoder.0.1.tdf.layers.2": 0.0,
+          "network.encoder.1.1.tdf.layers.0": 0.0042935945093631744,
+          "network.encoder.1.1.tdf.layers.2": 0.000575339188799262,
+          "network.encoder.2.1.tdf.layers.0": 0.0052808127366006374,
+          "network.encoder.2.1.tdf.layers.2": 0.0
+        },
+        "coverage_of_all_parameters": 0.5312681902158783,
+        "coverage_of_eligible": 0.5414495744132061,
+        "covered_parameters": 335872,
+        "delta": {
+          "complex_l1": 0.0037585651235921003,
+          "diagnostic_loss": 0.003890092883791274,
+          "global_sdr": -0.11466451202120087,
+          "waveform_l1": 0.00013152536536965853
+        },
+        "family": "tdf_linear",
+        "metrics": {
+          "complex_l1": 0.24815749643104418,
+          "diagnostic_loss": 0.2815060258976051,
+          "global_sdr": -2.6879388945443288,
+          "waveform_l1": 0.033348528668284416
+        },
+        "precision": "ternary",
+        "resolved_model_config": {
+          "activation_method": "ema",
+          "channels": [
+            24,
+            48,
+            96
+          ],
+          "frequency_bins": 1024,
+          "hop_length": 1024,
+          "layer_precisions": {
+            "tdf_linear": "ternary"
+          },
+          "n_fft": 4096,
+          "sources": 4,
+          "tdf_bottleneck": 16,
+          "ternary_method": "adaptive",
+          "w4_group_size": 32,
+          "zero_ratio": 0.4
+        },
+        "weight_statistics": [
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.0.1.tdf.layers.0.weight",
+            "parameters": 16384,
+            "scale_max": 0.032408859580755234,
+            "scale_mean": 0.028511198237538338,
+            "scale_min": 0.025448625907301903,
+            "zero_fraction": 0.400390625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.0.1.tdf.layers.2.weight",
+            "parameters": 16384,
+            "scale_max": 0.1958860158920288,
+            "scale_mean": 0.11439430713653564,
+            "scale_min": 0.08103587478399277,
+            "zero_fraction": 0.40625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.1.1.tdf.layers.0.weight",
+            "parameters": 65536,
+            "scale_max": 0.01585901528596878,
+            "scale_mean": 0.013382382690906525,
+            "scale_min": 0.011164456605911255,
+            "zero_fraction": 0.400390625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.decoder.1.1.tdf.layers.2.weight",
+            "parameters": 65536,
+            "scale_max": 0.10350528359413147,
+            "scale_mean": 0.07914593815803528,
+            "scale_min": 0.061925146728754044,
+            "zero_fraction": 0.40625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.0.1.tdf.layers.0.weight",
+            "parameters": 65536,
+            "scale_max": 0.03269254416227341,
+            "scale_mean": 0.024543805047869682,
+            "scale_min": 0.015707852318882942,
+            "zero_fraction": 0.400390625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.0.1.tdf.layers.2.weight",
+            "parameters": 65536,
+            "scale_max": 0.12299654632806778,
+            "scale_mean": 0.0851186141371727,
+            "scale_min": 0.06628096103668213,
+            "zero_fraction": 0.40625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.1.1.tdf.layers.0.weight",
+            "parameters": 16384,
+            "scale_max": 0.04705313593149185,
+            "scale_mean": 0.03837321698665619,
+            "scale_min": 0.032730940729379654,
+            "zero_fraction": 0.400390625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.1.1.tdf.layers.2.weight",
+            "parameters": 16384,
+            "scale_max": 0.19054144620895386,
+            "scale_mean": 0.11763115227222443,
+            "scale_min": 0.08212432265281677,
+            "zero_fraction": 0.40625
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.2.1.tdf.layers.0.weight",
+            "parameters": 4096,
+            "scale_max": 0.05088067427277565,
+            "scale_mean": 0.04720001667737961,
+            "scale_min": 0.04061529412865639,
+            "zero_fraction": 0.40234375
+          },
+          {
+            "integer_max": 1,
+            "integer_min": -1,
+            "name": "network.encoder.2.1.tdf.layers.2.weight",
+            "parameters": 4096,
+            "scale_max": 0.2660816013813019,
+            "scale_mean": 0.1701945960521698,
+            "scale_min": 0.10439731180667877,
+            "zero_fraction": 0.4375
+          }
+        ]
+      }
+    ],
+    "total_parameters": 632208
+  },
+  "split_sha256": "d4111b45f8b03291b88e9ed2aabe176696d26ed6133947e318de6882b30bd41f"
+}
