@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "status": "candidate shapes; regenerate results/operator_shapes.json from the selected checkpoint",
+  "gemm": [
+    {"name": "tdf_level_0_reduce", "m": 6144, "n": 64, "k": 1024},
+    {"name": "tdf_level_0_expand", "m": 6144, "n": 1024, "k": 64},
+    {"name": "tdf_level_1_reduce", "m": 6144, "n": 32, "k": 512},
+    {"name": "tdf_level_2_reduce", "m": 6144, "n": 16, "k": 256}
+  ],
+  "conv2d": [
+    {"name": "tfc_level_0", "batch": 1, "in_channels": 24, "out_channels": 24, "frequency": 1024, "frames": 256, "kernel": [3, 3]},
+    {"name": "tfc_level_1", "batch": 1, "in_channels": 48, "out_channels": 48, "frequency": 512, "frames": 128, "kernel": [3, 3]},
+    {"name": "tfc_level_2", "batch": 1, "in_channels": 96, "out_channels": 96, "frequency": 256, "frames": 64, "kernel": [3, 3]}
+  ]
+}

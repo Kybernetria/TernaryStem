@@ -1,0 +1,16 @@
+{
+  "probe": "synthetic_linear_regression",
+  "gate_0_evidence": false,
+  "method": "absmean",
+  "steps": 200,
+  "initial_mse": 1.1869804859161377,
+  "final_mse": 0.5957722663879395,
+  "improvement": 1.992339276066991,
+  "weight_stats": {
+    "zero": 0.607421875,
+    "positive": 0.201171875,
+    "negative": 0.19140625,
+    "scale_mean": 0.3356841504573822
+  },
+  "activation_saturation_rate": 0.0
+}

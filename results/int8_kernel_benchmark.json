@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "cpu": "AMD Ryzen 7 7730U",
+  "isa": "AVX2",
+  "threads": 1,
+  "torch": "2.13.0+cpu",
+  "fbgemm": {
+    "operator": "torch.ops.quantized.linear",
+    "activation_dtype": "quint8",
+    "includes": "dispatch and output requantization",
+    "excludes": "input quantization and weight prepacking",
+    "shapes": [
+      {"m": 64, "n": 256, "k": 512, "median_ms": 0.089483, "p95_ms": 0.097594},
+      {"m": 1, "n": 1024, "k": 1024, "median_ms": 0.035096, "p95_ms": 0.049693},
+      {"m": 16, "n": 1024, "k": 1024, "median_ms": 0.157482, "p95_ms": 0.166884},
+      {"m": 256, "n": 64, "k": 1024, "median_ms": 0.163152, "p95_ms": 0.175350},
+      {"m": 256, "n": 1024, "k": 128, "median_ms": 0.357128, "p95_ms": 0.390795}
+    ]
+  },
+  "note": "Cross-runtime comparison is provisional; fused epilogues and activation conventions are not yet matched."
+}

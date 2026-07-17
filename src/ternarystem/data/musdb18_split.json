@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "seed": 20250218,
+  "dataset": "MUSDB18-HQ",
+  "policy": "validation is the canonical musdb v0.4 14-track validation list; training is the other 86 official training tracks",
+  "validation": [
+    "Actions - One Minute Smile",
+    "Clara Berry And Wooldog - Waltz For My Victims",
+    "Johnny Lokke - Promises & Lies",
+    "Patrick Talbot - A Reason To Leave",
+    "Triviul - Angelsaint",
+    "Alexander Ross - Goodbye Bolero",
+    "Fergessen - Nos Palpitants",
+    "Leaf - Summerghost",
+    "Skelpolu - Human Mistakes",
+    "Young Griffo - Pennies",
+    "ANiMAL - Rockshow",
+    "James May - On The Line",
+    "Meaxic - Take A Step",
+    "Traffic Experiment - Sirens"
+  ]
+}

@@ -1,0 +1,572 @@
+{
+  "config": {
+    "channels": [
+      24,
+      48,
+      96
+    ],
+    "tdf_bottleneck": 16,
+    "n_fft": 4096,
+    "hop_length": 1024,
+    "frequency_bins": 1024,
+    "sources": 4,
+    "quantized": false,
+    "zero_ratio": 0.4,
+    "ternary_method": "adaptive"
+  },
+  "frames": 64,
+  "operators": [
+    {
+      "name": "input_projection",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        4,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        4,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "encoder.0.1.tfc.layers.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        24,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "encoder.0.1.tfc.layers.3",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        24,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "encoder.0.1.tdf.layers.0",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        24,
+        64,
+        1024
+      ],
+      "weight_shape": [
+        64,
+        1024
+      ],
+      "output_shape": [
+        1,
+        24,
+        64,
+        64
+      ]
+    },
+    {
+      "name": "encoder.0.1.tdf.layers.2",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        24,
+        64,
+        64
+      ],
+      "weight_shape": [
+        1024,
+        64
+      ],
+      "output_shape": [
+        1,
+        24,
+        64,
+        1024
+      ]
+    },
+    {
+      "name": "encoder.1.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        24,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "encoder.1.1.tfc.layers.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        48,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        48,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "encoder.1.1.tfc.layers.3",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        48,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        48,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "encoder.1.1.tdf.layers.0",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        48,
+        32,
+        512
+      ],
+      "weight_shape": [
+        32,
+        512
+      ],
+      "output_shape": [
+        1,
+        48,
+        32,
+        32
+      ]
+    },
+    {
+      "name": "encoder.1.1.tdf.layers.2",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        48,
+        32,
+        32
+      ],
+      "weight_shape": [
+        512,
+        32
+      ],
+      "output_shape": [
+        1,
+        48,
+        32,
+        512
+      ]
+    },
+    {
+      "name": "encoder.2.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        48,
+        256,
+        16
+      ],
+      "weight_shape": [
+        96,
+        48,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        96,
+        256,
+        16
+      ]
+    },
+    {
+      "name": "encoder.2.1.tfc.layers.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        96,
+        256,
+        16
+      ],
+      "weight_shape": [
+        96,
+        96,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        96,
+        256,
+        16
+      ]
+    },
+    {
+      "name": "encoder.2.1.tfc.layers.3",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        96,
+        256,
+        16
+      ],
+      "weight_shape": [
+        96,
+        96,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        96,
+        256,
+        16
+      ]
+    },
+    {
+      "name": "encoder.2.1.tdf.layers.0",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        96,
+        16,
+        256
+      ],
+      "weight_shape": [
+        16,
+        256
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        16
+      ]
+    },
+    {
+      "name": "encoder.2.1.tdf.layers.2",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        96,
+        16,
+        16
+      ],
+      "weight_shape": [
+        256,
+        16
+      ],
+      "output_shape": [
+        1,
+        96,
+        16,
+        256
+      ]
+    },
+    {
+      "name": "decoder.0.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        144,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        144,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "decoder.0.1.tfc.layers.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        48,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        48,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "decoder.0.1.tfc.layers.3",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        48,
+        512,
+        32
+      ],
+      "weight_shape": [
+        48,
+        48,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        48,
+        512,
+        32
+      ]
+    },
+    {
+      "name": "decoder.0.1.tdf.layers.0",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        48,
+        32,
+        512
+      ],
+      "weight_shape": [
+        32,
+        512
+      ],
+      "output_shape": [
+        1,
+        48,
+        32,
+        32
+      ]
+    },
+    {
+      "name": "decoder.0.1.tdf.layers.2",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        48,
+        32,
+        32
+      ],
+      "weight_shape": [
+        512,
+        32
+      ],
+      "output_shape": [
+        1,
+        48,
+        32,
+        512
+      ]
+    },
+    {
+      "name": "decoder.1.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        72,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        72,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "decoder.1.1.tfc.layers.0",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        24,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "decoder.1.1.tfc.layers.3",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        24,
+        24,
+        3,
+        3
+      ],
+      "output_shape": [
+        1,
+        24,
+        1024,
+        64
+      ]
+    },
+    {
+      "name": "decoder.1.1.tdf.layers.0",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        24,
+        64,
+        1024
+      ],
+      "weight_shape": [
+        64,
+        1024
+      ],
+      "output_shape": [
+        1,
+        24,
+        64,
+        64
+      ]
+    },
+    {
+      "name": "decoder.1.1.tdf.layers.2",
+      "operator": "Linear",
+      "input_shape": [
+        1,
+        24,
+        64,
+        64
+      ],
+      "weight_shape": [
+        1024,
+        64
+      ],
+      "output_shape": [
+        1,
+        24,
+        64,
+        1024
+      ]
+    },
+    {
+      "name": "output_projection",
+      "operator": "Conv2d",
+      "input_shape": [
+        1,
+        24,
+        1024,
+        64
+      ],
+      "weight_shape": [
+        16,
+        24,
+        1,
+        1
+      ],
+      "output_shape": [
+        1,
+        16,
+        1024,
+        64
+      ]
+    }
+  ]
+}
