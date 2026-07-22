@@ -27,6 +27,7 @@ def summarize_record(record: dict, label: str) -> dict:
     config = record.get("config") or {}
     model = config.get("model") or {}
     precision = (config.get("quant") or {}).get("layer_precisions") or {}
+    amp = (config.get("train") or {}).get("amp", "off")
 
     def point(item: dict | None) -> dict | None:
         if item is None:
@@ -53,7 +54,15 @@ def summarize_record(record: dict, label: str) -> dict:
         "label": label,
         "metric_label": "development global_sdr (not BSSEval)",
         "output_parameterization": model.get("output_parameterization", "direct_estimate"),
-        "training_precision": "fp32" if not precision else "quantization_aware_or_mixed",
+        "training_precision": (
+            f"fp32_weights_{amp}_autocast"
+            if not precision and amp != "off"
+            else "fp32"
+            if not precision
+            else f"quantization_aware_or_mixed_{amp}_autocast"
+            if amp != "off"
+            else "quantization_aware_or_mixed"
+        ),
         "layer_precisions": precision,
         "best": point(best),
         "final": point(final),

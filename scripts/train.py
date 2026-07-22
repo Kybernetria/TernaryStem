@@ -106,7 +106,10 @@ if amp_mode not in {"off", "fp16", "bf16"}:
 if amp_mode != "off" and device.type != "cuda":
     raise ValueError("train.amp requires a CUDA device")
 amp_dtype = torch.float16 if amp_mode == "fp16" else torch.bfloat16
-scaler = torch.cuda.amp.GradScaler(enabled=amp_mode == "fp16")
+if hasattr(torch.amp, "GradScaler"):
+    scaler = torch.amp.GradScaler("cuda", enabled=amp_mode == "fp16")
+else:  # PyTorch 2.2 compatibility
+    scaler = torch.cuda.amp.GradScaler(enabled=amp_mode == "fp16")
 optimizer = torch.optim.AdamW(model.parameters(), lr=train_config["learning_rate"])
 scheduler = build_scheduler(optimizer, train_config)
 start_epoch = 0

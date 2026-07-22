@@ -24,6 +24,7 @@ train:
   learning_rate: 0.0001
   epochs: 1
   checkpoint_every: 1
+  amp: fp16
   waveform_l1: 1.0
   complex_l1: 1.0
   multires_stft: 0.5
