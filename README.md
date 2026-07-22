@@ -97,4 +97,4 @@ Capture candidate operator shapes with:
 python scripts/inventory.py --config configs/experiment.yaml
 ```
 
-The benchmark contract is frozen in [`docs/BENCHMARK_PROTOCOL.md`](docs/BENCHMARK_PROTOCOL.md). See [`docs/STATUS.md`](docs/STATUS.md) for completed work and open gates. Dataset audio, generated stems, checkpoints, and binaries must not be committed.
+The benchmark contract is frozen in [`docs/BENCHMARK_PROTOCOL.md`](docs/BENCHMARK_PROTOCOL.md). See [`docs/STATUS.md`](docs/STATUS.md) for completed work and open gates. To resume work in a fresh assistant session, copy [`docs/NEW_SESSION_PROMPT.md`](docs/NEW_SESSION_PROMPT.md). Dataset audio, generated stems, checkpoints, and binaries must not be committed.
