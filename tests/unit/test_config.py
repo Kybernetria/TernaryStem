@@ -33,6 +33,15 @@ def test_matched_smoke_fp32_configs_only_differ_in_output_parameterization():
     assert direct == mask
 
 
+def test_colab_medium_uses_complex_masks_and_fp32_boundaries():
+    config = load_config("configs/colab/fp32_mask_medium.yaml")
+    resolved = model_config(config)
+    assert resolved.output_parameterization == "complex_mask"
+    assert not resolved.layer_precisions
+    assert resolved.precision_for("projections", "input_projection") == "fp32"
+    assert resolved.precision_for("projections", "output_projection") == "fp32"
+
+
 def test_matched_colab_distillation_configs_only_differ_in_enabled_flag():
     control = load_config("configs/colab/fp32_mask_control.yaml")
     distilled = load_config("configs/colab/htdemucs_distillation.yaml")

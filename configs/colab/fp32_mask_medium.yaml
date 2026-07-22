@@ -1,0 +1,27 @@
+seed: 20250218
+data:
+  sample_rate: 44100
+  chunk_seconds: 3.0
+  epoch_chunks: 256
+  validation_chunks: 56
+model:
+  channels: [16, 32, 64]
+  tdf_bottleneck: 8
+  n_fft: 2048
+  hop_length: 512
+  frequency_bins: 512
+  output_parameterization: complex_mask
+quant:
+  threshold: adaptive
+  target_zero_ratio: 0.4
+  w4_group_size: 32
+  activation_method: ema
+  layer_precisions: {}
+train:
+  batch_size: 1
+  learning_rate: 0.0003
+  epochs: 20
+  checkpoint_every: 5
+  waveform_l1: 1.0
+  complex_l1: 1.0
+  multires_stft: 0.0
