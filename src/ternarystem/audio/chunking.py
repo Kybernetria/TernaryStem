@@ -24,7 +24,12 @@ def overlap_add(
         valid = min(chunk_samples, length - start)
         chunk = torch.nn.functional.pad(waveform[..., start : start + valid], (0, chunk_samples - valid))
         estimate = separate(chunk)[..., :valid]
-        window = torch.hann_window(chunk_samples + 2, device=waveform.device)[1:-1][:valid]
+        window = torch.hann_window(
+            chunk_samples + 2, device=waveform.device, dtype=estimate.dtype
+        )[1:-1][:valid]
+        # At long chunk sizes the first nonzero Hann coefficient can round to zero
+        # in FP32. A representable floor keeps boundary samples reconstructible.
+        window = window.clamp_min(torch.finfo(estimate.dtype).eps)
         if output is None:
             output = estimate.new_zeros(*estimate.shape[:-1], length)
             weight_sum = estimate.new_zeros(length)
