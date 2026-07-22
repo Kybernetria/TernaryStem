@@ -33,6 +33,13 @@ def test_matched_smoke_fp32_configs_only_differ_in_output_parameterization():
     assert direct == mask
 
 
+def test_matched_colab_distillation_configs_only_differ_in_enabled_flag():
+    control = load_config("configs/colab/fp32_mask_control.yaml")
+    distilled = load_config("configs/colab/htdemucs_distillation.yaml")
+    control["distillation"]["enabled"] = True
+    assert control == distilled
+
+
 def test_matched_remote_fp32_configs_only_differ_in_output_parameterization():
     direct = load_config("configs/remote/fp32_direct.yaml")
     mask = load_config("configs/remote/fp32_complex_mask.yaml")
