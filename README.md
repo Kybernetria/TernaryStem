@@ -54,6 +54,16 @@ python scripts/train.py --config configs/smoke/mixed.yaml \
 
 Use `--resume runs/mixed/latest.pt` only to restore the exact same configuration, optimizer, and scheduler after interruption.
 
+Optional output distillation from the frozen `htdemucs_ft` teacher is available without adding the teacher to student checkpoints or inference. Install it separately and run the bounded smoke before enabling it for a larger experiment:
+
+```bash
+pip install -e '.[teacher]'
+python scripts/train.py --config configs/smoke/htdemucs_distillation.yaml \
+  --data-root /datasets/MUSDB18-HQ/train --output-dir runs/distillation-smoke
+```
+
+MUSDB ground truth remains the primary objective. The deterministic teacher uses no shifts, is projected to mixture consistency, and is only evaluated every `distillation.every_n_steps`; compare matched runs before retaining it.
+
 Run immediate development-split layer-family sensitivity diagnostics from an FP checkpoint with:
 
 ```bash

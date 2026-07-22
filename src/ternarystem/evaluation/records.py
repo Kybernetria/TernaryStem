@@ -72,6 +72,7 @@ def base_record(config: dict, seed: int, device: str | None = None) -> dict:
             "numpy": _package_version("numpy"),
             "soundfile": _package_version("soundfile"),
             "pyyaml": _package_version("PyYAML"),
+            "demucs": _package_version("demucs"),
             "musdb": _package_version("musdb"),
             "museval": _package_version("museval"),
         },

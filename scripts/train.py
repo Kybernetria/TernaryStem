@@ -22,10 +22,14 @@ from ternarystem.models import Separator
 from ternarystem.training import (
     atomic_torch_save,
     build_scheduler,
+    build_teacher,
+    distillation_config,
     load_checkpoint,
+    prepare_teacher_targets,
     resume_training,
     ternary_training_summary,
     warm_start_model,
+    waveform_distillation_l1,
 )
 
 parser = argparse.ArgumentParser()
@@ -49,6 +53,7 @@ args = parser.parse_args()
 if args.require_cuda and (not torch.cuda.is_available() or not args.device.startswith("cuda")):
     raise SystemExit("CUDA was required, but the selected device is not an available CUDA device")
 config = load_config(args.config)
+distillation = distillation_config(config)
 torch.manual_seed(config["seed"])
 model_cfg = model_config(config)
 model = Separator(model_cfg)
@@ -109,6 +114,7 @@ if not args.resume and args.output_dir.exists() and any(args.output_dir.iterdir(
     raise SystemExit(
         f"refusing to start a new run in non-empty output directory: {args.output_dir}"
     )
+teacher = build_teacher(distillation, device)
 args.output_dir.mkdir(parents=True, exist_ok=True)
 record_path = args.output_dir / "experiment.json"
 latest_path = args.output_dir / "latest.pt"
@@ -130,6 +136,7 @@ record["execution"] = {
     "data_root": str(args.data_root.resolve()),
     "workers": args.workers,
 }
+record["distillation"] = asdict(distillation)
 if not args.resume or "initialization" not in record:
     initialization_checkpoint = args.init_checkpoint if args.init_checkpoint else args.resume
     record["initialization"] = {
@@ -168,6 +175,12 @@ record["checkpoint_sha256"] = record["checkpoint_hashes"]["latest"]
 # Persist resume provenance and reconciliation even when training is already complete.
 save_record(record_path, record)
 weights = config["train"]
+steps_per_epoch = math.ceil(config["data"]["epoch_chunks"] / weights["batch_size"])
+global_step = (
+    int(checkpoint_payload.get("global_step", start_epoch * steps_per_epoch))
+    if args.resume and checkpoint_payload is not None
+    else 0
+)
 
 for epoch in range(start_epoch, config["train"]["epochs"]):
     dataset.set_epoch(epoch)
@@ -179,16 +192,28 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         "sdr": 0.0,
         "gradient_norm": 0.0,
     }
+    distillation_sum = 0.0
+    distillation_batches = 0
     batches = 0
     for mixture, targets in loader:
         mixture, targets = mixture.to(device), targets.to(device)
         optimizer.zero_grad(set_to_none=True)
+        teacher_targets = None
+        if teacher is not None and global_step % distillation.every_n_steps == 0:
+            teacher_targets = prepare_teacher_targets(
+                teacher(mixture), mixture, distillation.enforce_mixture_consistency
+            )
         estimate_spectra = model.spectrograms(mixture)
         estimates = model.stft.synthesis(estimate_spectra, mixture.shape[-1])
         target_spectra = model.stft.analysis(targets)
         waveform_loss = F.l1_loss(estimates, targets)
         spectrum_loss = complex_l1(estimate_spectra, target_spectra)
         loss = weights["waveform_l1"] * waveform_loss + weights["complex_l1"] * spectrum_loss
+        if teacher_targets is not None:
+            teacher_loss = waveform_distillation_l1(estimates, teacher_targets)
+            loss = loss + distillation.weight * teacher_loss
+            distillation_sum += float(teacher_loss.detach())
+            distillation_batches += 1
         if weights.get("multires_stft", 0) > 0:
             loss = loss + weights["multires_stft"] * multiresolution_stft_loss(
                 estimates, targets
@@ -202,6 +227,7 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
                 f"non-finite gradient norm at epoch {epoch}, batch {batches}"
             )
         optimizer.step()
+        global_step += 1
         sums["loss"] += float(loss.detach())
         sums["waveform_l1"] += float(waveform_loss.detach())
         sums["complex_l1"] += float(spectrum_loss.detach())
@@ -209,6 +235,9 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         sums["gradient_norm"] += float(gradient_norm.detach())
         batches += 1
     metrics = {key: value / max(1, batches) for key, value in sums.items()}
+    if teacher is not None:
+        metrics["distillation_l1"] = distillation_sum / max(1, distillation_batches)
+        metrics["distillation_batches"] = distillation_batches
     metrics["epoch"] = epoch
     model.eval()
     diagnostics = DevelopmentDiagnostics(model_cfg.sources)
@@ -241,6 +270,7 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         "config": asdict(model_cfg),
         "resolved_config": config,
         "epoch": epoch,
+        "global_step": global_step,
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict() if scheduler is not None else None,

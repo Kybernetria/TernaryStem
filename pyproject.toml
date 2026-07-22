@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 eval = ["museval>=0.4", "musdb>=0.4"]
+teacher = ["demucs>=4.0.1,<5"]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.5"]
 
 [project.scripts]

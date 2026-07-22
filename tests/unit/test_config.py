@@ -6,7 +6,17 @@ from ternarystem.config import load_config, model_config
 
 
 @pytest.mark.parametrize(
-    "name", ["fp32", "fp32_medium", "ternary_qat", "w4a8", "w8a8", "mixed"]
+    "name",
+    [
+        "fp32",
+        "fp32_complex_mask",
+        "fp32_medium",
+        "htdemucs_distillation",
+        "ternary_qat",
+        "w4a8",
+        "w8a8",
+        "mixed",
+    ],
 )
 def test_remote_smoke_configs_resolve_with_fp32_boundaries(name):
     config = load_config(Path("configs/smoke") / f"{name}.yaml")
@@ -14,6 +24,13 @@ def test_remote_smoke_configs_resolve_with_fp32_boundaries(name):
     assert resolved.frequency_bins <= resolved.n_fft // 2 + 1
     assert resolved.precision_for("projections", "input_projection") == "fp32"
     assert resolved.precision_for("projections", "output_projection") == "fp32"
+
+
+def test_matched_smoke_fp32_configs_only_differ_in_output_parameterization():
+    direct = load_config("configs/smoke/fp32.yaml")
+    mask = load_config("configs/smoke/fp32_complex_mask.yaml")
+    direct["model"]["output_parameterization"] = "complex_mask"
+    assert direct == mask
 
 
 def test_matched_remote_fp32_configs_only_differ_in_output_parameterization():
