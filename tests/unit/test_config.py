@@ -38,6 +38,7 @@ def test_matched_smoke_fp32_configs_only_differ_in_output_parameterization():
     [
         "configs/colab/fp32_mask_medium.yaml",
         "configs/colab/fp32_mask_large_pilot.yaml",
+        "configs/colab/fp16_mask_large_pilot.yaml",
     ],
 )
 def test_colab_fp32_candidates_use_complex_masks_and_fp32_boundaries(path):
@@ -47,6 +48,21 @@ def test_colab_fp32_candidates_use_complex_masks_and_fp32_boundaries(path):
     assert not resolved.layer_precisions
     assert resolved.precision_for("projections", "input_projection") == "fp32"
     assert resolved.precision_for("projections", "output_projection") == "fp32"
+
+
+def test_matched_colab_fp16_pilot_only_enables_amp():
+    fp32 = load_config("configs/colab/fp32_mask_large_pilot.yaml")
+    fp16 = load_config("configs/colab/fp16_mask_large_pilot.yaml")
+    assert fp16["train"].pop("amp") == "fp16"
+    assert fp16 == fp32
+
+
+def test_colab_large_ternary_pilot_is_selective():
+    config = model_config(load_config("configs/colab/ternary_mask_large_pilot.yaml"))
+    assert config.precision_for("tdf_linear", "encoder.0.1.tdf.layers.0") == "ternary"
+    assert config.precision_for("bottleneck_conv", "encoder.2.1.tfc.layers.0") == "ternary"
+    assert config.precision_for("encoder_conv", "encoder.0.1.tfc.layers.0") == "fp32"
+    assert config.precision_for("decoder_conv", "decoder.0.1.tfc.layers.0") == "fp32"
 
 
 def test_matched_colab_distillation_configs_only_differ_in_enabled_flag():

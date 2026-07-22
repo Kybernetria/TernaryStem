@@ -3,7 +3,7 @@ from ternarystem.evaluation import base_record
 
 def test_record_captures_explicit_software_and_hardware_metadata():
     record = base_record({"model": {}}, 7, "cpu")
-    assert record["schema_version"] == 2
+    assert record["schema_version"] == 3
     assert record["host"]["device"] == "cpu"
     assert isinstance(record["host"]["cuda_available"], bool)
     assert "gpu_model" in record["host"]

@@ -42,7 +42,7 @@ python scripts/train.py --config configs/experiment.yaml \
   --data-root /datasets/MUSDB18-HQ/train --output-dir runs/baseline
 ```
 
-Runs save resumable `latest.pt` and structured `experiment.json` artifacts. Validation records explicitly labeled development `global_sdr`/L1 by stem and an equal-share baseline; these are not BSSEval. Precision is selected under `quant.layer_precisions` by layer family or exact module path. Reduced remote smoke configurations are available in `configs/smoke/`. Matched longer direct-estimate and bounded complex-mask FP32 configurations are in `configs/remote/`; input/output projections and FP32 reconstruction boundaries remain FP32 unless explicitly overridden.
+Runs save resumable `latest.pt` and structured `experiment.json` artifacts. Schema-v3 validation records energy-aggregated development `global_sdr`, historical mean-chunk SDR, L1 by stem, and an equal-share baseline; none are BSSEval. Re-evaluate an existing checkpoint with `scripts/validate.py`. Precision is selected under `quant.layer_precisions` by layer family or exact module path. Reduced remote smoke configurations are available in `configs/smoke/`. Matched longer direct-estimate and bounded complex-mask FP32 configurations are in `configs/remote/`; input/output projections and FP32 reconstruction boundaries remain FP32 unless explicitly overridden. Optional `train.amp: fp16` or `bf16` autocasts the neural core while retaining explicit FP32 signal-processing/reconstruction boundaries and resumable gradient-scaler state.
 
 Warm-start a QAT smoke run from the matched FP checkpoint with a fresh optimizer:
 

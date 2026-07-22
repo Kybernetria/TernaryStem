@@ -14,8 +14,21 @@ def test_development_diagnostics_include_stems_and_equal_share_baseline():
     assert result["label"] == "development diagnostics (not BSSEval)"
     assert set(result["per_stem_global_sdr"]) == {"vocals", "drums", "bass", "other"}
     assert result["global_sdr"] > 80
+    assert result["mean_chunk_sdr"] > 80
     assert result["equal_share_baseline"]["global_sdr"] > 80
     assert result["per_stem_waveform_l1"]["vocals"] == 0
+
+
+def test_energy_aggregated_sdr_is_not_dominated_by_one_silent_chunk():
+    diagnostics = DevelopmentDiagnostics(1)
+    silent_target = torch.zeros(1, 1, 2, 8)
+    noisy_silence = torch.ones_like(silent_target) * 0.01
+    diagnostics.update(noisy_silence, silent_target, torch.zeros(1, 2, 8))
+    active_target = torch.ones(1, 1, 2, 8)
+    diagnostics.update(active_target * 0.9, active_target, active_target[:, 0])
+    result = diagnostics.compute()
+    assert result["global_sdr"] > result["mean_chunk_sdr"]
+    assert result["sdr_aggregation"].startswith("sum signal/error energy")
 
 
 def test_comparison_handles_new_and_legacy_records_without_calling_sdr_bsseval():

@@ -63,9 +63,12 @@ class MUSDBChunkDataset(IterableDataset):
         worker = get_worker_info()
         worker_id = worker.id if worker else 0
         workers = worker.num_workers if worker else 1
-        rng = random.Random(self.seed + self.epoch * 1_000_003 + worker_id)
-        count = (self.epoch_chunks + workers - 1 - worker_id) // workers
-        for _ in range(count):
+        # Derive each sample from its global index so worker count does not change
+        # the canonical training/validation examples.
+        for sample_index in range(worker_id, self.epoch_chunks, workers):
+            rng = random.Random(
+                self.seed + self.epoch * 1_000_003 + sample_index * 97_409
+            )
             anchor = rng.choice(self.track_names)
             aligned_start = None
             if not self.remix:

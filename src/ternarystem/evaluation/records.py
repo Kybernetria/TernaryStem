@@ -49,7 +49,7 @@ def base_record(config: dict, seed: int, device: str | None = None) -> dict:
         except (AssertionError, RuntimeError, ValueError):
             gpu_model = None
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": _git("rev-parse", "HEAD"),
         "git_dirty": None if status is None else bool(status),
