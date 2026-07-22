@@ -1,6 +1,6 @@
-# Benchmark Protocol (v1.0)
+# Benchmark Protocol (v1.1)
 
-This file is frozen for the first development cycle. Changes require a version bump and invalidate direct comparisons with earlier records.
+This file is frozen for the first development cycle. Changes require a version bump and invalidate direct comparisons with earlier records. Version 1.1 makes energy aggregation across development chunks explicit; schema-v2 mean-chunk records are not directly comparable to schema-v3 canonical global SDR.
 
 ## Data and split
 
@@ -13,7 +13,7 @@ This file is frozen for the first development cycle. Changes require a version b
 
 ## Quality
 
-Primary publication metrics are museval BSSEval v4 SDR for vocals, drums, bass, other, and their unweighted mean. Report track-level median and mean. Training diagnostics use the separately named `global_sdr`, defined as `10 log10(sum(target²) / (sum((target-estimate)²) + 1e-8))` over channels and time; it must not be called BSSEval SDR.
+Primary publication metrics are museval BSSEval v4 SDR for vocals, drums, bass, other, and their unweighted mean. Report track-level median and mean. The canonical training diagnostic is separately named energy-aggregated development `global_sdr`: sum target and error energy over channels, time, and all fixed development chunks, take `10 log10((sum(target²) + 1e-8) / (sum((target-estimate)²) + 1e-8))` per stem, then report the unweighted stem mean. Also retain mean-of-chunk SDR to expose silent-chunk behavior. Neither diagnostic may be called BSSEval SDR.
 
 Record chunk size, overlap, window, shifts, ensembles, source-specific tuning, and extra data. Default inference uses 6 s chunks, 50% overlap, Hann synthesis weighting, no shifts, and no ensemble. Report silent-target handling explicitly.
 

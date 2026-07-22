@@ -18,7 +18,7 @@ if command -v apt-get >/dev/null && [[ "$(id -u)" == 0 ]]; then
   log "installing small OS prerequisites (never installing/replacing CUDA)"
   apt-get update -qq
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    git libsndfile1 rsync ca-certificates util-linux python3-venv
+    git libsndfile1 rsync wget unzip ca-certificates util-linux python3-venv
   rm -rf /var/lib/apt/lists/*
 fi
 

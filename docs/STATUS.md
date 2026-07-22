@@ -13,7 +13,7 @@
 - Runtime-dispatched AVX2 packed-ternary and INT8 prototypes with exact vector-path tests.
 - Unit/integration tests, synthetic QAT probes, and a captured operator-shape inventory.
 - Streaming MUSDB chunk/remix augmentation, fixed validation chunks, best/latest checkpoints, exact optimizer/epoch/scheduler resume, and separate FP-to-QAT warm-start loading with fresh optimizer/scheduler state.
-- Development-only validation diagnostics now report overall and per-stem `global_sdr`, per-stem waveform L1, and the matched `mixture / 4` equal-share baseline. Records and console output label these diagnostics as not BSSEval.
+- Schema-v3 development diagnostics now report canonical energy-aggregated overall/per-stem `global_sdr`, historical mean-chunk SDR, waveform L1, and the matched `mixture / 4` equal-share baseline. Records and console output label all diagnostics as not BSSEval.
 - Checkpoint-compatible output parameterization supports the original direct complex estimate and a bounded Cartesian complex mask applied to the retained mixture spectrogram. Both preserve FP32 reconstruction, frequency padding, source/stereo shapes, and waveform mixture consistency.
 - Matched long-run FP32 direct-estimate and complex-mask configurations use the same split, seed, model capacity, validation chunks, budget, and cosine learning-rate schedule.
 - Experiment schema v2 records the selected device, PyTorch/CUDA availability and versions, GPU model when available, relevant package versions, and post-write hashes for both latest and best checkpoints. A compact comparison command summarizes model versus equal-share, output mode, FP32/mixed precision, and best/final development diagnostics.
@@ -28,9 +28,13 @@ A user-operated remote GPU run on the frozen MUSDB18-HQ development split is rec
 
 Matched ten-epoch continuations from the same FP checkpoint reached -3.1445 dB for FP32 and -3.1669 dB for selective ternary QAT, a -0.0224 dB diagnostic difference. This demonstrates recovery on a reduced development task only. It is not BSSEval, does not establish useful separation, and does not pass Gate 1 or Gate 2. The remote record omitted GPU identity and PyTorch/CUDA versions; no remote latency statement is made.
 
+## Colab engineering pilot (operator-retained artifacts)
+
+A T4 pilot validated the 632,208-parameter complex-mask shape with six-second chunks, batch four, full losses, checkpoint recovery, FP16 autocast, selective ternary QAT, chunked overlap-add inference, silence handling, and deterministic export. FP32 reached 2.5480 dB energy-aggregated development global SDR versus a 1.2470 dB equal-share baseline after five short epochs. FP16 was 27% faster and 0.0096 dB lower over that budget, which is not proof of equal full convergence. Eight selective-QAT updates covered 80.10% of parameters and measured -0.1245 dB versus the matched FP checkpoint; the FP model is still incapable, so this is plumbing evidence rather than Gate 1/2. Listening revealed substantial leakage and slightly better FP32 drums/bass. Silent input produced exact zero, packed export contained 13 ternary weight tensors, and overlap-add reconstruction reached about 3.6e-7 maximum mixture error after fixing a long-window boundary bug. Checkpoints/audio remain outside Git.
+
 ## Verification in this environment
 
-C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (39 tests), and Ruff passes. All six smoke configurations and both matched long-run FP32 output-mode configurations pass local model-construction dry runs. Direct/mask shape, reconstruction, backward, frequency-padding, mixture-consistency, legacy-checkpoint, scheduler-resume, diagnostic, comparison, and metadata tests pass. No remote checkpoint resume has been exercised yet. Python dependencies were installed in an isolated CPU-only virtual environment under `/tmp` with pip caching disabled, avoiding the home-directory quota.
+C++ configuration/build and scalar/AVX2 correctness tests pass. The full Python suite passes (58 tests), and Ruff passes. Smoke, Colab pilot, and matched long-run configurations pass local construction/configuration checks. Direct/mask shape, reconstruction, backward, frequency-padding, mixture-consistency, worker-independent sampling, legacy-checkpoint, scheduler/scaler-resume, diagnostic, comparison, persistence, distillation, and metadata tests pass. Python dependencies were installed in an isolated CPU-only distrobox environment.
 
 ## Open gates
 
