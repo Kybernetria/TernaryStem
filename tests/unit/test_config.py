@@ -33,8 +33,15 @@ def test_matched_smoke_fp32_configs_only_differ_in_output_parameterization():
     assert direct == mask
 
 
-def test_colab_medium_uses_complex_masks_and_fp32_boundaries():
-    config = load_config("configs/colab/fp32_mask_medium.yaml")
+@pytest.mark.parametrize(
+    "path",
+    [
+        "configs/colab/fp32_mask_medium.yaml",
+        "configs/colab/fp32_mask_large_pilot.yaml",
+    ],
+)
+def test_colab_fp32_candidates_use_complex_masks_and_fp32_boundaries(path):
+    config = load_config(path)
     resolved = model_config(config)
     assert resolved.output_parameterization == "complex_mask"
     assert not resolved.layer_precisions
