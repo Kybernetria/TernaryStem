@@ -64,6 +64,16 @@ def test_output_parameterizations_preserve_shapes_backward_and_exact_mixture(par
     assert all(parameter.grad is not None for parameter in model.parameters())
 
 
+def test_autocast_network_constructs_complex64_at_reconstruction_boundary():
+    model = Separator(
+        SeparatorConfig(channels=(4,), n_fft=32, hop_length=8, frequency_bins=16)
+    )
+    features = torch.randn(1, 4, 16, 8)
+    with torch.autocast(device_type="cpu", dtype=torch.bfloat16):
+        spectra = model.network(features)
+    assert spectra.dtype == torch.complex64
+
+
 def test_direct_mode_loads_state_from_checkpoint_config_without_new_field():
     original = Separator(SeparatorConfig(channels=(4,), n_fft=32, hop_length=8, frequency_bins=16))
     legacy_config = {

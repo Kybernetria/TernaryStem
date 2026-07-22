@@ -217,7 +217,9 @@ class TFCTDFUNet(nn.Module):
         for block, skip in zip(self.decoder, reversed(skips[:-1])):
             current = F.interpolate(current, size=skip.shape[-2:], mode="bilinear", align_corners=False)
             current = block(torch.cat((current, skip), dim=1))
-        output = self.output_projection(current)
+        # ComplexHalf remains experimental in PyTorch. Cast at the explicit FP32
+        # reconstruction boundary before constructing source spectra.
+        output = self.output_projection(current).float()
         batch, _, frequencies, frames = output.shape
         output = output.reshape(batch, self.config.sources, 2, 2, frequencies, frames)
         return torch.complex(output[:, :, :, 0], output[:, :, :, 1])
