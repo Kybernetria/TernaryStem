@@ -33,7 +33,9 @@ cmake --build build/bitnet --target bitnet_comparison
 
 ## Training
 
-Full training is intended for a remote GPU with MUSDB18-HQ available locally to that host:
+Full training is intended for a remote GPU with MUSDB18-HQ available locally to that host. For a guarded Vast.ai bootstrap, detached FP-to-selective-ternary pipeline, atomic recovery, and off-instance backup workflow, follow [`docs/VAST_AI.md`](docs/VAST_AI.md).
+
+Manual training:
 
 ```bash
 python scripts/train.py --config configs/experiment.yaml \

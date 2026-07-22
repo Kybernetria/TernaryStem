@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import platform
 import subprocess
@@ -14,6 +13,7 @@ from pathlib import Path
 import torch
 
 from ternarystem.data import split_hash
+from ternarystem.training.persistence import atomic_json_save
 
 
 def _git(*args: str) -> str | None:
@@ -84,6 +84,4 @@ def base_record(config: dict, seed: int, device: str | None = None) -> dict:
 
 
 def save_record(path: str | Path, record: dict) -> None:
-    destination = Path(path)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    atomic_json_save(record, path)

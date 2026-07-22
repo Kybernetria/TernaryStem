@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import sys
 from dataclasses import asdict
 from pathlib import Path
 
@@ -17,7 +19,14 @@ from ternarystem.data import MUSDBChunkDataset, validate_track_names
 from ternarystem.evaluation import DevelopmentDiagnostics, base_record, save_record, sha256
 from ternarystem.losses import complex_l1, global_sdr, multiresolution_stft_loss
 from ternarystem.models import Separator
-from ternarystem.training import build_scheduler, load_checkpoint, resume_training, warm_start_model
+from ternarystem.training import (
+    atomic_torch_save,
+    build_scheduler,
+    load_checkpoint,
+    resume_training,
+    ternary_training_summary,
+    warm_start_model,
+)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", default="configs/experiment.yaml")
@@ -30,8 +39,15 @@ checkpoint_group.add_argument(
 )
 parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
 parser.add_argument("--workers", type=int, default=4)
+parser.add_argument(
+    "--require-cuda",
+    action="store_true",
+    help="fail instead of silently falling back to CPU on a rented GPU host",
+)
 parser.add_argument("--dry-run", action="store_true")
 args = parser.parse_args()
+if args.require_cuda and (not torch.cuda.is_available() or not args.device.startswith("cuda")):
+    raise SystemExit("CUDA was required, but the selected device is not an available CUDA device")
 config = load_config(args.config)
 torch.manual_seed(config["seed"])
 model_cfg = model_config(config)
@@ -89,35 +105,80 @@ if args.resume:
 elif args.init_checkpoint:
     checkpoint_payload = load_checkpoint(args.init_checkpoint, device)
     missing_quantizer_keys = warm_start_model(model, checkpoint_payload)
+if not args.resume and args.output_dir.exists() and any(args.output_dir.iterdir()):
+    raise SystemExit(
+        f"refusing to start a new run in non-empty output directory: {args.output_dir}"
+    )
 args.output_dir.mkdir(parents=True, exist_ok=True)
 record_path = args.output_dir / "experiment.json"
+latest_path = args.output_dir / "latest.pt"
+best_path = args.output_dir / "best.pt"
 if args.resume and record_path.is_file():
     record = json.loads(record_path.read_text(encoding="utf-8"))
     record.setdefault("resume_events", []).append(base_record(config, config["seed"], args.device))
 else:
     record = base_record(config, config["seed"], args.device)
-    record["training"] = (
-        list(checkpoint_payload.get("training_history", []))
-        if args.resume and checkpoint_payload is not None
-        else []
-    )
-record["initialization"] = {
-    "mode": "resume" if args.resume else "warm_start" if args.init_checkpoint else "scratch",
-    "checkpoint": str(args.resume or args.init_checkpoint)
-    if args.resume or args.init_checkpoint
-    else None,
-    "checkpoint_sha256": sha256(args.resume or args.init_checkpoint)
-    if args.resume or args.init_checkpoint
-    else None,
-    "missing_quantizer_state": missing_quantizer_keys,
-    "start_epoch": start_epoch,
+# A validated checkpoint is authoritative if a crash happened between checkpoint and
+# experiment-record publication.
+record["training"] = (
+    list(checkpoint_payload.get("training_history", []))
+    if args.resume and checkpoint_payload is not None
+    else []
+)
+record["execution"] = {
+    "argv": sys.argv,
+    "data_root": str(args.data_root.resolve()),
+    "workers": args.workers,
 }
+if not args.resume or "initialization" not in record:
+    initialization_checkpoint = args.init_checkpoint if args.init_checkpoint else args.resume
+    record["initialization"] = {
+        "mode": "resume" if args.resume else "warm_start" if args.init_checkpoint else "scratch",
+        "checkpoint": str(initialization_checkpoint) if initialization_checkpoint else None,
+        "checkpoint_sha256": sha256(initialization_checkpoint)
+        if initialization_checkpoint
+        else None,
+        "missing_quantizer_state": missing_quantizer_keys,
+        "start_epoch": start_epoch,
+    }
+if args.resume and checkpoint_payload is not None:
+    # Reconcile a crash after latest.pt publication but before best.pt/JSON publication.
+    selected_resume = args.resume.resolve()
+    if not latest_path.is_file() or selected_resume != latest_path.resolve():
+        # An explicitly restored/periodic checkpoint becomes the single authoritative latest.
+        atomic_torch_save(checkpoint_payload, latest_path)
+    best_epoch = max(
+        record["training"], key=lambda item: item["validation_global_sdr"]
+    )["epoch"]
+    existing_best_epoch = None
+    if best_path.is_file():
+        existing_best = load_checkpoint(best_path, "cpu")
+        if existing_best.get("resolved_config") != config:
+            raise ValueError("best checkpoint configuration differs from the resumed run")
+        existing_best_epoch = existing_best.get("epoch")
+    if existing_best_epoch != best_epoch:
+        if checkpoint_payload.get("epoch") != best_epoch:
+            raise ValueError("cannot reconcile best checkpoint with authoritative history")
+        atomic_torch_save(checkpoint_payload, best_path)
+record.setdefault("checkpoint_hashes", {})["latest"] = (
+    sha256(latest_path) if latest_path.is_file() else None
+)
+record["checkpoint_hashes"]["best"] = sha256(best_path) if best_path.is_file() else None
+record["checkpoint_sha256"] = record["checkpoint_hashes"]["latest"]
+# Persist resume provenance and reconciliation even when training is already complete.
+save_record(record_path, record)
 weights = config["train"]
 
 for epoch in range(start_epoch, config["train"]["epochs"]):
     dataset.set_epoch(epoch)
     model.train()
-    sums = {"loss": 0.0, "waveform_l1": 0.0, "complex_l1": 0.0, "sdr": 0.0}
+    sums = {
+        "loss": 0.0,
+        "waveform_l1": 0.0,
+        "complex_l1": 0.0,
+        "sdr": 0.0,
+        "gradient_norm": 0.0,
+    }
     batches = 0
     for mixture, targets in loader:
         mixture, targets = mixture.to(device), targets.to(device)
@@ -132,13 +193,20 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
             loss = loss + weights["multires_stft"] * multiresolution_stft_loss(
                 estimates, targets
             )
+        if not torch.isfinite(loss):
+            raise FloatingPointError(f"non-finite loss at epoch {epoch}, batch {batches}")
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+        gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+        if not torch.isfinite(gradient_norm):
+            raise FloatingPointError(
+                f"non-finite gradient norm at epoch {epoch}, batch {batches}"
+            )
         optimizer.step()
         sums["loss"] += float(loss.detach())
         sums["waveform_l1"] += float(waveform_loss.detach())
         sums["complex_l1"] += float(spectrum_loss.detach())
         sums["sdr"] += float(global_sdr(estimates.detach(), targets))
+        sums["gradient_norm"] += float(gradient_norm.detach())
         batches += 1
     metrics = {key: value / max(1, batches) for key, value in sums.items()}
     metrics["epoch"] = epoch
@@ -160,6 +228,14 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     if scheduler is not None:
         scheduler.step()
     metrics["next_learning_rate"] = optimizer.param_groups[0]["lr"]
+    metrics["quantization"] = ternary_training_summary(model)
+    if not all(
+        math.isfinite(value)
+        for key, value in metrics.items()
+        if key not in {"validation_development_diagnostics", "quantization"}
+        and isinstance(value, (int, float))
+    ):
+        raise FloatingPointError(f"non-finite epoch metrics at epoch {epoch}")
     record["training"].append(metrics)
     checkpoint = {
         "config": asdict(model_cfg),
@@ -171,14 +247,17 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
         "metrics": metrics,
         "training_history": record["training"],
     }
-    latest_path = args.output_dir / "latest.pt"
-    best_path = args.output_dir / "best.pt"
-    torch.save(checkpoint, latest_path)
+    atomic_torch_save(checkpoint, latest_path)
     previous = record["training"][:-1]
     if not previous or metrics["validation_global_sdr"] > max(
         item["validation_global_sdr"] for item in previous
     ):
-        torch.save(checkpoint, best_path)
+        atomic_torch_save(checkpoint, best_path)
+    checkpoint_every = int(config["train"].get("checkpoint_every", 0))
+    if checkpoint_every > 0 and (
+        (epoch + 1) % checkpoint_every == 0 or epoch + 1 == config["train"]["epochs"]
+    ):
+        atomic_torch_save(checkpoint, args.output_dir / f"epoch-{epoch + 1:04d}.pt")
     record.setdefault("checkpoint_hashes", {})["latest"] = sha256(latest_path)
     record["checkpoint_hashes"]["best"] = sha256(best_path) if best_path.is_file() else None
     record["checkpoint_sha256"] = record["checkpoint_hashes"]["latest"]
