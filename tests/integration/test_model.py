@@ -104,6 +104,32 @@ def test_zero_complex_masks_reconstruct_as_equal_share_after_consistency():
     torch.testing.assert_close(estimates, expected, atol=2e-5, rtol=2e-5)
 
 
+def test_unused_exact_layer_precision_selector_is_rejected():
+    config = SeparatorConfig(
+        channels=(4,),
+        tdf_bottleneck=4,
+        n_fft=32,
+        hop_length=8,
+        frequency_bins=16,
+        layer_precisions={"encoder.0.1.tdf.layers.typo": "w8a8"},
+    )
+    with pytest.raises(ValueError, match="unused layer precision selectors"):
+        Separator(config)
+
+
+def test_unused_precision_family_is_rejected_for_incompatible_topology():
+    config = SeparatorConfig(
+        channels=(4,),
+        tdf_bottleneck=4,
+        n_fft=32,
+        hop_length=8,
+        frequency_bins=16,
+        layer_precisions={"decoder_conv": "w8a8"},
+    )
+    with pytest.raises(ValueError, match="unused layer precision selectors"):
+        Separator(config)
+
+
 def test_exact_layer_precision_overrides_family_and_boundary_default():
     config = SeparatorConfig(
         channels=(4,),

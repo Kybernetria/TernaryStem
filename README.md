@@ -33,7 +33,7 @@ cmake --build build/bitnet --target bitnet_comparison
 
 ## Training
 
-Full training is intended for a remote GPU with MUSDB18-HQ available locally to that host. For a guarded Vast.ai bootstrap, detached FP-to-selective-ternary pipeline, atomic recovery, and off-instance backup workflow, follow [`docs/VAST_AI.md`](docs/VAST_AI.md).
+Full training is intended for an authorized GPU host with MUSDB18-HQ available locally. The FP-to-selective-ternary Vast procedure in [`docs/VAST_AI.md`](docs/VAST_AI.md) is retained for deployment #1 evidence only and must not be relaunched. Deployment #2 is the separate FP-only architecture screen in [`docs/DEPLOYMENT_2.md`](docs/DEPLOYMENT_2.md); `python scripts/deployment_2.py readiness` binds the clean checkout through `.deployment2-lock.json` and fails closed until authorized local CUDA evidence is supplied.
 
 Manual training:
 

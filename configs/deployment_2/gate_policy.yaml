@@ -1,0 +1,59 @@
+schema_version: 1
+metric: development_global_sdr_not_bsseval
+refuse_missing_or_nonfinite: true
+tie_behavior: stop_no_quality_winner
+control_c:
+  reference_10k_global_sdr: 3.3151
+  absolute_tolerance_db: 0.35
+  maximum_chunks: 10000
+  promotable: false
+material_stem_collapse:
+  minimum_margin_over_equal_share_db: 0.0
+positive_learning_signal:
+  minimum_best_minus_first_db: 0.10
+  require_training_loss_decrease: true
+recent_slope:
+  window: 3
+  estimator: ordinary_least_squares
+  minimum_db_per_validation: 0.0
+paired_interval:
+  grouping: track
+  method: percentile_bootstrap
+  confidence_level: 0.95
+  bootstrap_samples: 10000
+  seed: 20250218
+quality_winner:
+  minimum_paired_advantage_db: 0.15
+credible_extrapolation:
+  method: recent_ols_lower_bound
+  confidence_level: 0.95
+  target_db: 7.5
+  require_positive_lower_slope: true
+reserve:
+  overhead_fraction: 0.20
+  synchronization_seconds: 600
+  formula: ceil(projected_remaining_seconds * 1.20) + synchronization_seconds
+budget:
+  approved_cents_per_hour: 80
+  planned_seconds: 162000
+  planned_cents: 3600
+  absolute_seconds: 180000
+  absolute_cents: 4000
+rungs:
+  commissioning:
+    cumulative_chunks: 10000
+  comparison_30k:
+    cumulative_chunks: 30000
+  comparison_100k:
+    cumulative_chunks: 100000
+    minimum_global_sdr: 5.40
+    alternative_improvement_over_30k_db: 0.25
+  selected_200k:
+    cumulative_chunks: 200000
+    minimum_improvement_over_100k_db: 0.20
+    must_exceed_deployment_1_db: 5.447996425849241
+  confirmation_300k:
+    cumulative_chunks: 300000
+    minimum_global_sdr: 6.3
+  final:
+    target_global_sdr: 7.5

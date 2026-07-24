@@ -1,0 +1,40 @@
+schema_version: 1
+deployment_id: gpu-deployment-2
+source_commit_file: .deployment2-lock.json
+fp_only: true
+require_cuda: true
+forbid_dirty_source: true
+forbidden_actions:
+  - sensitivity
+  - qat
+  - ptq
+  - distillation
+  - amp
+  - extra_data
+  - official_test
+  - arbitrary_config
+  - unapproved_checkpoint_lineage
+candidates:
+  C:
+    architecture: legacy_tfc_tdf_v1
+    config: configs/remote/fp32_complex_mask.yaml
+    sha256: ee52fcb17e77e4aeff2bc05e381b090446db275c97248ca67aa01a4806047f3f
+    maximum_chunks: 10000
+  A:
+    architecture: ternarystem_v2_fullband_temporal_v1
+    config: configs/deployment_2/ternarystem_v2.yaml
+    sha256: b34b5cee2ec78e88d0828c39c75cf8cd4524a52e6ea0957ab22d2326ab4541c2
+  B:
+    architecture: scnet_5d95bf96_adapted_v1
+    config: configs/deployment_2/scnet.yaml
+    sha256: 7a728da13d85bd557c5ebc9cce55dba66563bbf0bf8e4c2f4ae13a358ed73398
+gate_policy:
+  path: configs/deployment_2/gate_policy.yaml
+  sha256: 856ce9f4c9ce0514df6e6459fbe292b3d5866a22f2306108ab02de0f3d83163c
+required_evidence:
+  controller_fake_matrix:
+    path: results/readiness/controller_fake_matrix.json
+    sha256: aa3350da9a31d1223e8eb59400c98a9e09c549f30a762230775ebdf2f2c1c1d0
+provenance:
+  scnet_document_sha256: 15c700b4c04093037e10ae455c1e34bf9136aafc6a1b9bf89f1ddf4ba3f62851
+  scnet_tree_sha256: b0f5a840238d03f8fd9238d7cbda9967d9270339170dde293afa157610d98eb3

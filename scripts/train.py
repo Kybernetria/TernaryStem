@@ -6,28 +6,38 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import sys
 import time
 from contextlib import nullcontext
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 from ternarystem.config import load_config, model_config
-from ternarystem.data import MUSDBChunkDataset, validate_track_names
+from ternarystem.data import (
+    MUSDBChunkDataset,
+    validate_development_data_root,
+    validate_track_names,
+)
 from ternarystem.evaluation import DevelopmentDiagnostics, base_record, save_record, sha256
 from ternarystem.losses import complex_l1, global_sdr, multiresolution_stft_loss
-from ternarystem.models import Separator
+from ternarystem.models import architecture_identity, build_separator
 from ternarystem.training import (
     atomic_torch_save,
     build_scheduler,
     build_teacher,
+    canonical_json_sha256,
+    capture_rng_state,
+    deterministic_backend_state,
     distillation_config,
     load_checkpoint,
     prepare_teacher_targets,
+    resolve_stop_epoch,
     resume_training,
     ternary_training_summary,
     warm_start_model,
@@ -50,15 +60,23 @@ parser.add_argument(
     action="store_true",
     help="fail instead of silently falling back to CPU on a rented GPU host",
 )
+parser.add_argument(
+    "--stop-after-completed-chunks",
+    type=int,
+    help="stop at a cumulative rung boundary without changing the maximum-horizon config",
+)
 parser.add_argument("--dry-run", action="store_true")
 args = parser.parse_args()
 if args.require_cuda and (not torch.cuda.is_available() or not args.device.startswith("cuda")):
     raise SystemExit("CUDA was required, but the selected device is not an available CUDA device")
 config = load_config(args.config)
 distillation = distillation_config(config)
+random.seed(config["seed"])
+np.random.seed(config["seed"])
 torch.manual_seed(config["seed"])
 model_cfg = model_config(config)
-model = Separator(model_cfg)
+model = build_separator(config)
+source_count = len(getattr(model, "source_order", ())) or int(model_cfg.sources)
 parameters = sum(parameter.numel() for parameter in model.parameters())
 print(json.dumps({"parameters": parameters, "model_config": asdict(model_cfg)}, indent=2))
 if args.dry_run:
@@ -66,6 +84,7 @@ if args.dry_run:
 if args.data_root is None:
     raise SystemExit("--data-root is required unless --dry-run is used")
 
+args.data_root = validate_development_data_root(args.data_root)
 track_names = sorted(path.name for path in args.data_root.iterdir() if path.is_dir())
 train_names, validation_names = validate_track_names(track_names)
 chunk_samples = round(config["data"]["sample_rate"] * config["data"]["chunk_seconds"])
@@ -90,6 +109,7 @@ validation_dataset = MUSDBChunkDataset(
     config["seed"] + 1,
     remix=False,
     augment=False,
+    include_metadata=True,
 )
 validation_loader = DataLoader(
     validation_dataset,
@@ -100,6 +120,14 @@ validation_loader = DataLoader(
 device = torch.device(args.device)
 model.to(device)
 train_config = config["train"]
+accumulation_steps = int(train_config.get("gradient_accumulation_steps", 1))
+if accumulation_steps < 1:
+    raise ValueError("train.gradient_accumulation_steps must be positive")
+physical_batch_size = int(train_config["batch_size"])
+steps_per_epoch = math.ceil(config["data"]["epoch_chunks"] / physical_batch_size)
+if steps_per_epoch % accumulation_steps:
+    raise ValueError("epoch must end on a gradient-accumulation boundary")
+effective_batch_size = physical_batch_size * accumulation_steps
 amp_mode = str(train_config.get("amp", "off")).lower()
 if amp_mode not in {"off", "fp16", "bf16"}:
     raise ValueError("train.amp must be off, fp16, or bf16")
@@ -110,7 +138,16 @@ if hasattr(torch.amp, "GradScaler"):
     scaler = torch.amp.GradScaler("cuda", enabled=amp_mode == "fp16")
 else:  # PyTorch 2.2 compatibility
     scaler = torch.cuda.amp.GradScaler(enabled=amp_mode == "fp16")
-optimizer = torch.optim.AdamW(model.parameters(), lr=train_config["learning_rate"])
+optimizer_name = str(train_config.get("optimizer", "adamw")).lower()
+optimizer_class = {"adam": torch.optim.Adam, "adamw": torch.optim.AdamW}.get(optimizer_name)
+if optimizer_class is None:
+    raise ValueError(f"unsupported optimizer: {optimizer_name!r}")
+optimizer = optimizer_class(
+    model.parameters(),
+    lr=train_config["learning_rate"],
+    betas=tuple(train_config.get("betas", (0.9, 0.999))),
+    weight_decay=float(train_config.get("weight_decay", 0.01 if optimizer_name == "adamw" else 0)),
+)
 scheduler = build_scheduler(optimizer, train_config)
 start_epoch = 0
 checkpoint_payload = None
@@ -119,6 +156,12 @@ if args.resume:
     checkpoint_payload = load_checkpoint(args.resume, device)
     if checkpoint_payload.get("resolved_config") != config:
         raise ValueError("exact resume requires the checkpoint's resolved configuration")
+    if int(checkpoint_payload.get("checkpoint_schema_version", 0)) >= 2:
+        identity = architecture_identity(config)
+        if checkpoint_payload.get("config_sha256") != canonical_json_sha256(config):
+            raise ValueError("checkpoint configuration hash does not match resolved config")
+        if checkpoint_payload.get("provenance_sha256") != identity["provenance_sha256"]:
+            raise ValueError("checkpoint provenance hash does not match architecture")
     start_epoch = resume_training(model, optimizer, checkpoint_payload, scheduler)
     if scaler.is_enabled():
         if not isinstance(checkpoint_payload.get("scaler"), dict):
@@ -131,6 +174,8 @@ if not args.resume and args.output_dir.exists() and any(args.output_dir.iterdir(
     raise SystemExit(
         f"refusing to start a new run in non-empty output directory: {args.output_dir}"
     )
+if getattr(model, "loss_profile", "legacy") != "legacy" and distillation.enabled:
+    raise ValueError("architecture-specific loss profiles do not support distillation")
 teacher = build_teacher(distillation, device)
 args.output_dir.mkdir(parents=True, exist_ok=True)
 record_path = args.output_dir / "experiment.json"
@@ -155,6 +200,14 @@ record["execution"] = {
 }
 record["distillation"] = asdict(distillation)
 record["mixed_precision_training"] = amp_mode
+record["architecture"] = architecture_identity(config)
+record["config_sha256"] = canonical_json_sha256(config)
+record["effective_batch"] = {
+    "physical_batch_size": physical_batch_size,
+    "gradient_accumulation_steps": accumulation_steps,
+    "effective_batch_size": effective_batch_size,
+}
+record["deterministic_backend"] = deterministic_backend_state()
 if not args.resume or "initialization" not in record:
     initialization_checkpoint = args.init_checkpoint if args.init_checkpoint else args.resume
     record["initialization"] = {
@@ -193,14 +246,21 @@ record["checkpoint_sha256"] = record["checkpoint_hashes"]["latest"]
 # Persist resume provenance and reconciliation even when training is already complete.
 save_record(record_path, record)
 weights = train_config
-steps_per_epoch = math.ceil(config["data"]["epoch_chunks"] / weights["batch_size"])
 global_step = (
     int(checkpoint_payload.get("global_step", start_epoch * steps_per_epoch))
     if args.resume and checkpoint_payload is not None
     else 0
 )
+stop_epoch = resolve_stop_epoch(
+    config["data"], config["train"], args.stop_after_completed_chunks
+)
+cumulative_optimizer_updates = (
+    int(checkpoint_payload.get("optimizer_updates", 0))
+    if args.resume and checkpoint_payload is not None
+    else 0
+)
 
-for epoch in range(start_epoch, config["train"]["epochs"]):
+for epoch in range(start_epoch, stop_epoch):
     dataset.set_epoch(epoch)
     model.train()
     if device.type == "cuda":
@@ -219,9 +279,10 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     batches = 0
     skipped_optimizer_steps = 0
     optimizer_updates = 0
+    gradient_updates = 0
+    optimizer.zero_grad(set_to_none=True)
     for mixture, targets in loader:
         mixture, targets = mixture.to(device), targets.to(device)
-        optimizer.zero_grad(set_to_none=True)
         teacher_targets = None
         if teacher is not None and global_step % distillation.every_n_steps == 0:
             teacher_targets = prepare_teacher_targets(
@@ -233,12 +294,23 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
             else nullcontext()
         )
         with autocast:
-            estimate_spectra = model.spectrograms(mixture)
-        estimates = model.stft.synthesis(estimate_spectra, mixture.shape[-1])
+            if getattr(model, "loss_profile", "legacy") == "scnet_spec_rmse":
+                estimates = model.training_estimates(mixture)
+                loss = model.training_loss(estimates, targets)
+                estimate_spectra = model.stft.analysis(estimates)
+            else:
+                estimate_spectra = model.spectrograms(mixture)
+                estimates = model.stft.synthesis(estimate_spectra, mixture.shape[-1])
+                waveform_component = F.l1_loss(estimates, targets)
+                target_spectra = model.stft.analysis(targets)
+                spectrum_component = complex_l1(estimate_spectra, target_spectra)
+                loss = (
+                    weights["waveform_l1"] * waveform_component
+                    + weights["complex_l1"] * spectrum_component
+                )
         target_spectra = model.stft.analysis(targets)
         waveform_loss = F.l1_loss(estimates, targets)
         spectrum_loss = complex_l1(estimate_spectra, target_spectra)
-        loss = weights["waveform_l1"] * waveform_loss + weights["complex_l1"] * spectrum_loss
         if teacher_targets is not None:
             teacher_loss = waveform_distillation_l1(estimates, teacher_targets)
             loss = loss + distillation.weight * teacher_loss
@@ -250,36 +322,46 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
             )
         if not torch.isfinite(loss):
             raise FloatingPointError(f"non-finite loss at epoch {epoch}, batch {batches}")
-        scaler.scale(loss).backward()
-        if scaler.is_enabled():
-            scaler.unscale_(optimizer)
-        gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
-        gradient_is_finite = bool(torch.isfinite(gradient_norm))
-        if not gradient_is_finite and not scaler.is_enabled():
-            raise FloatingPointError(
-                f"non-finite gradient norm at epoch {epoch}, batch {batches}"
+        scaler.scale(loss / accumulation_steps).backward()
+        update_boundary = (batches + 1) % accumulation_steps == 0
+        if update_boundary:
+            if scaler.is_enabled():
+                scaler.unscale_(optimizer)
+            gradient_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+            gradient_is_finite = bool(torch.isfinite(gradient_norm))
+            if not gradient_is_finite and not scaler.is_enabled():
+                raise FloatingPointError(
+                    f"non-finite gradient norm at epoch {epoch}, batch {batches}"
+                )
+            scale_before = scaler.get_scale()
+            scaler.step(optimizer)
+            scaler.update()
+            step_was_skipped = scaler.is_enabled() and scaler.get_scale() < scale_before
+            skipped_optimizer_steps += int(step_was_skipped)
+            optimizer_updates += int(not step_was_skipped)
+            cumulative_optimizer_updates += int(not step_was_skipped)
+            sums["gradient_norm"] += (
+                float(gradient_norm.detach()) if gradient_is_finite else 0.0
             )
-        scale_before = scaler.get_scale()
-        scaler.step(optimizer)
-        scaler.update()
-        step_was_skipped = scaler.is_enabled() and scaler.get_scale() < scale_before
-        skipped_optimizer_steps += int(step_was_skipped)
-        optimizer_updates += int(not step_was_skipped)
+            gradient_updates += 1
+            optimizer.zero_grad(set_to_none=True)
         global_step += 1
         sums["loss"] += float(loss.detach())
         sums["waveform_l1"] += float(waveform_loss.detach())
         sums["complex_l1"] += float(spectrum_loss.detach())
         sums["sdr"] += float(global_sdr(estimates.detach(), targets))
-        sums["gradient_norm"] += (
-            float(gradient_norm.detach()) if gradient_is_finite else 0.0
-        )
         batches += 1
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     training_seconds = time.perf_counter() - training_started
     metrics = {key: value / max(1, batches) for key, value in sums.items()}
+    metrics["gradient_norm"] = sums["gradient_norm"] / max(1, gradient_updates)
     metrics["attempted_steps"] = batches
     metrics["optimizer_steps"] = optimizer_updates
+    metrics["cumulative_optimizer_updates"] = cumulative_optimizer_updates
+    metrics["completed_chunks"] = (epoch + 1) * config["data"]["epoch_chunks"]
+    metrics["sample_exposure"] = metrics["completed_chunks"]
+    metrics["effective_batch_size"] = effective_batch_size
     metrics["skipped_optimizer_steps"] = skipped_optimizer_steps
     metrics["training_seconds"] = training_seconds
     metrics["training_chunks_per_second"] = config["data"]["epoch_chunks"] / max(
@@ -291,12 +373,18 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     metrics["epoch"] = epoch
     model.eval()
     validation_started = time.perf_counter()
-    diagnostics = DevelopmentDiagnostics(model_cfg.sources)
+    diagnostics = DevelopmentDiagnostics(source_count)
     with torch.inference_mode():
-        for mixture, targets in validation_loader:
+        for mixture, targets, metadata in validation_loader:
             mixture, targets = mixture.to(device), targets.to(device)
             estimates = model(mixture)
-            diagnostics.update(estimates, targets, mixture)
+            diagnostics.update(
+                estimates,
+                targets,
+                mixture,
+                sample_ids=list(metadata["sample_id"]),
+                track_names=list(metadata["track"]),
+            )
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     validation_seconds = time.perf_counter() - validation_started
@@ -310,7 +398,7 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     # Preserve these flat names for existing records and best-checkpoint selection.
     metrics["validation_waveform_l1"] = sum(
         development["per_stem_waveform_l1"].values()
-    ) / model_cfg.sources
+    ) / source_count
     metrics["validation_global_sdr"] = development["global_sdr"]
     metrics["learning_rate"] = optimizer.param_groups[0]["lr"]
     if scheduler is not None:
@@ -325,16 +413,28 @@ for epoch in range(start_epoch, config["train"]["epochs"]):
     ):
         raise FloatingPointError(f"non-finite epoch metrics at epoch {epoch}")
     record["training"].append(metrics)
+    identity = architecture_identity(config)
     checkpoint = {
+        "checkpoint_schema_version": 2,
+        "architecture": identity,
+        "config_sha256": canonical_json_sha256(config),
+        "provenance_sha256": identity["provenance_sha256"],
         "config": asdict(model_cfg),
         "resolved_config": config,
         "epoch": epoch,
         "global_step": global_step,
+        "completed_chunks": metrics["completed_chunks"],
+        "sample_exposure": metrics["sample_exposure"],
+        "optimizer_updates": cumulative_optimizer_updates,
+        "effective_batch": record["effective_batch"],
+        "rung_lineage": train_config.get("rung_lineage"),
         "data_workers": args.workers,
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict() if scheduler is not None else None,
         "scaler": scaler.state_dict() if scaler.is_enabled() else None,
+        "rng_state": capture_rng_state(),
+        "deterministic_backend": deterministic_backend_state(),
         "metrics": metrics,
         "training_history": record["training"],
     }

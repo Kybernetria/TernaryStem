@@ -1,4 +1,4 @@
-from .diagnostics import DevelopmentDiagnostics, STEM_NAMES
+from .diagnostics import STEM_NAMES, DevelopmentDiagnostics
 from .records import base_record, save_record, sha256
 
-__all__ = ["DevelopmentDiagnostics", "STEM_NAMES", "base_record", "save_record", "sha256"]
+__all__ = ["STEM_NAMES", "DevelopmentDiagnostics", "base_record", "save_record", "sha256"]

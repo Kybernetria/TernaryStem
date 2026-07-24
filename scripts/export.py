@@ -8,8 +8,8 @@ from pathlib import Path
 
 import torch
 
-from ternarystem.config import model_config
 from ternarystem.export import export_state_dict
+from ternarystem.models import config_from_checkpoint
 
 parser = argparse.ArgumentParser()
 parser.add_argument("checkpoint", type=Path)
@@ -27,17 +27,8 @@ parser.add_argument(
 args = parser.parse_args()
 payload = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
 state = payload.get("state_dict", payload)
-if "resolved_config" in payload:
-    config = model_config(payload["resolved_config"])
-elif "config" in payload:
-    raw = dict(payload["config"])
-    raw["channels"] = tuple(raw["channels"])
-    from ternarystem.models import SeparatorConfig
-
-    config = SeparatorConfig(**raw)
-else:
-    raise SystemExit("checkpoint has no resolved model configuration")
-precisions = dict(config.layer_precisions)
+config = config_from_checkpoint(payload)
+precisions = dict(getattr(config, "layer_precisions", {}))
 for item in args.precision:
     try:
         key, value = item.split("=", 1)
@@ -47,9 +38,9 @@ for item in args.precision:
 export_state_dict(
     state,
     args.output,
-    config.zero_ratio if args.zero_ratio is None else args.zero_ratio,
-    config.ternary_method if args.method is None else args.method,
+    getattr(config, "zero_ratio", 0.4) if args.zero_ratio is None else args.zero_ratio,
+    getattr(config, "ternary_method", "adaptive") if args.method is None else args.method,
     args.packing,
     precisions,
-    config.w4_group_size,
+    getattr(config, "w4_group_size", 32),
 )

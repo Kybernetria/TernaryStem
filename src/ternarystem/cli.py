@@ -7,7 +7,7 @@ import soundfile as sf
 import torch
 
 from ternarystem.audio import overlap_add
-from ternarystem.models import Separator, SeparatorConfig
+from ternarystem.models import build_from_checkpoint
 
 
 def main() -> None:
@@ -23,9 +23,8 @@ def main() -> None:
     if sample_rate != 44100 or audio.shape[1] != 2:
         raise SystemExit("input must be stereo 44.1 kHz audio")
     payload = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
-    config = SeparatorConfig(**payload["config"])
     device = torch.device(args.device)
-    model = Separator(config).to(device).eval()
+    model = build_from_checkpoint(payload).to(device).eval()
     model.load_state_dict(payload["state_dict"])
     waveform = torch.from_numpy(audio.T).unsqueeze(0).to(device)
     with torch.inference_mode():

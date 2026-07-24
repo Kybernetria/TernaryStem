@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import torch
-from torch import Tensor, nn
 import torch.nn.functional as F
+from torch import Tensor, nn
 
 from ternarystem.audio import STFT, mixture_consistency
 from ternarystem.quant import (
@@ -56,8 +56,12 @@ class SeparatorConfig:
 class LayerFactory:
     def __init__(self, config: SeparatorConfig) -> None:
         self.config = config
+        self._consumed_selectors: set[str] = set()
 
     def _kwargs(self, family: str, path: str) -> tuple[str, dict]:
+        selector = path if path in self.config.layer_precisions else family
+        if selector in self.config.layer_precisions:
+            self._consumed_selectors.add(selector)
         precision = self.config.precision_for(family, path)
         common = {"activation_method": self.config.activation_method}
         if precision == "ternary":
@@ -89,6 +93,11 @@ class LayerFactory:
         if precision != "fp32":
             kwargs.update(quant_kwargs)
         return classes[precision](*args, **kwargs)
+
+    def validate_selectors(self) -> None:
+        unused = set(self.config.layer_precisions) - self._consumed_selectors
+        if unused:
+            raise ValueError(f"unused layer precision selectors: {sorted(unused)}")
 
 
 class TFCBlock(nn.Module):
@@ -205,6 +214,7 @@ class TFCTDFUNet(nn.Module):
         self.output_projection = factory.conv(
             "projections", "output_projection", config.channels[0], config.sources * 2 * 2, 1
         )
+        factory.validate_selectors()
 
     def forward(self, features: Tensor) -> Tensor:
         current = self.input_projection(features)
@@ -226,9 +236,12 @@ class TFCTDFUNet(nn.Module):
 
 
 class Separator(nn.Module):
-    def __init__(self, config: SeparatorConfig = SeparatorConfig()) -> None:
+    architecture_id = "legacy_tfc_tdf_v1"
+
+    def __init__(self, config: SeparatorConfig | None = None) -> None:
         super().__init__()
-        self.config = config
+        self.config = config if config is not None else SeparatorConfig()
+        config = self.config
         self.stft = STFT(config.n_fft, config.hop_length)
         self.network = TFCTDFUNet(config)
 

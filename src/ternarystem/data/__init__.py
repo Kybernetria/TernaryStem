@@ -1,10 +1,14 @@
-from .musdb import MUSDBChunkDataset, STEMS
-from .split import load_split, split_hash, validate_track_names
+from .musdb import STEMS, MUSDBChunkDataset, SampleSpec, StemSampleSpec, generate_sample_spec
+from .split import load_split, split_hash, validate_development_data_root, validate_track_names
 
 __all__ = [
-    "MUSDBChunkDataset",
     "STEMS",
+    "MUSDBChunkDataset",
+    "SampleSpec",
+    "StemSampleSpec",
+    "generate_sample_spec",
     "load_split",
     "split_hash",
+    "validate_development_data_root",
     "validate_track_names",
 ]

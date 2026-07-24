@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from typing import Protocol
 
 import torch
-from torch import Tensor
 import torch.nn.functional as F
+from torch import Tensor
 
 from ternarystem.audio import mixture_consistency
 from ternarystem.data import STEMS

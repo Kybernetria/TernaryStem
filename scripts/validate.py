@@ -10,9 +10,13 @@ from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
 
-from ternarystem.data import MUSDBChunkDataset, validate_track_names
+from ternarystem.data import (
+    MUSDBChunkDataset,
+    validate_development_data_root,
+    validate_track_names,
+)
 from ternarystem.evaluation import DevelopmentDiagnostics, base_record, save_record, sha256
-from ternarystem.models import Separator, SeparatorConfig
+from ternarystem.models import build_from_checkpoint, config_from_checkpoint
 
 parser = argparse.ArgumentParser()
 parser.add_argument("checkpoint", type=Path)
@@ -25,9 +29,7 @@ parser.add_argument("--output", type=Path)
 args = parser.parse_args()
 
 payload = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
-raw_config = dict(payload["config"])
-raw_config["channels"] = tuple(raw_config["channels"])
-model_config = SeparatorConfig(**raw_config)
+model_config = config_from_checkpoint(payload)
 resolved = payload.get("resolved_config") or {}
 data_config = resolved.get("data") or {}
 train_config = resolved.get("train") or {}
@@ -39,6 +41,7 @@ chunk_samples = round(
     float(data_config.get("sample_rate", 44100))
     * float(data_config.get("chunk_seconds", 6.0))
 )
+args.data_root = validate_development_data_root(args.data_root)
 track_names = sorted(path.name for path in args.data_root.iterdir() if path.is_dir())
 _, validation_names = validate_track_names(track_names)
 dataset = MUSDBChunkDataset(
@@ -49,16 +52,24 @@ dataset = MUSDBChunkDataset(
     seed + 1,
     remix=False,
     augment=False,
+    include_metadata=True,
 )
 loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers)
 device = torch.device(args.device)
-model = Separator(model_config).to(device).eval()
+model = build_from_checkpoint(payload).to(device).eval()
 model.load_state_dict(payload["state_dict"])
-diagnostics = DevelopmentDiagnostics(model_config.sources)
+source_count = len(getattr(model, "source_order", ())) or int(model_config.sources)
+diagnostics = DevelopmentDiagnostics(source_count)
 with torch.inference_mode():
-    for mixture, targets in loader:
+    for mixture, targets, metadata in loader:
         mixture, targets = mixture.to(device), targets.to(device)
-        diagnostics.update(model(mixture), targets, mixture)
+        diagnostics.update(
+            model(mixture),
+            targets,
+            mixture,
+            sample_ids=list(metadata["sample_id"]),
+            track_names=list(metadata["track"]),
+        )
 result = diagnostics.compute()
 record = base_record(
     {

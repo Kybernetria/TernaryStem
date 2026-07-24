@@ -8,8 +8,8 @@ track list. It does not train, recover, or access the official test partition.
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict, replace
 import json
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import torch
@@ -19,7 +19,13 @@ from torch.utils.data import DataLoader
 from ternarystem.data import MUSDBChunkDataset, validate_track_names
 from ternarystem.evaluation import base_record, save_record, sha256
 from ternarystem.losses import complex_l1, global_sdr
-from ternarystem.models import LAYER_FAMILIES, Separator, SeparatorConfig
+from ternarystem.models import (
+    LAYER_FAMILIES,
+    LEGACY_ARCHITECTURE_ID,
+    Separator,
+    checkpoint_architecture_id,
+    config_from_checkpoint,
+)
 from ternarystem.quant import symmetric_weight_values, ternary_values
 
 parser = argparse.ArgumentParser()
@@ -35,12 +41,9 @@ parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else
 args = parser.parse_args()
 
 payload = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
-if "config" not in payload:
-    raise SystemExit("checkpoint must contain its resolved SeparatorConfig")
-raw_config = dict(payload["config"])
-raw_config["channels"] = tuple(raw_config["channels"])
-raw_config.setdefault("layer_precisions", {})
-fp_config = SeparatorConfig(**raw_config)
+if checkpoint_architecture_id(payload) != LEGACY_ARCHITECTURE_ID:
+    raise SystemExit("sensitivity is not implemented for this checkpoint architecture")
+fp_config = config_from_checkpoint(payload)
 if fp_config.layer_precisions:
     raise SystemExit("sensitivity requires an FP checkpoint with empty layer_precisions")
 state_dict = payload["state_dict"]

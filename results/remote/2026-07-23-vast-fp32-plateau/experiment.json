@@ -1,0 +1,2384 @@
+{
+  "checkpoint_hashes": {
+    "best": "7c9a1c8c03f6f494a736a83f7753ad35ae7bad6f1c88b7b2b962a4b102aa0f8f",
+    "latest": "56d0843998297accdd82314f6bc6b2f90ace6527a1d949d147af430aca250cc6"
+  },
+  "checkpoint_sha256": "56d0843998297accdd82314f6bc6b2f90ace6527a1d949d147af430aca250cc6",
+  "config": {
+    "data": {
+      "chunk_seconds": 6.0,
+      "epoch_chunks": 10000,
+      "sample_rate": 44100,
+      "validation_chunks": 140
+    },
+    "model": {
+      "channels": [
+        24,
+        48,
+        96
+      ],
+      "frequency_bins": 1024,
+      "hop_length": 1024,
+      "n_fft": 4096,
+      "output_parameterization": "complex_mask",
+      "tdf_bottleneck": 16
+    },
+    "quant": {
+      "activation_method": "ema",
+      "layer_precisions": {},
+      "target_zero_ratio": 0.4,
+      "threshold": "adaptive",
+      "w4_group_size": 32
+    },
+    "seed": 20250218,
+    "train": {
+      "batch_size": 4,
+      "checkpoint_every": 5,
+      "complex_l1": 1.0,
+      "epochs": 100,
+      "learning_rate": 0.0003,
+      "multires_stft": 0.5,
+      "scheduler": {
+        "eta_min": 1e-05,
+        "name": "cosine",
+        "t_max": 100
+      },
+      "waveform_l1": 1.0
+    }
+  },
+  "created_utc": "2026-07-23T16:53:22.705634+00:00",
+  "distillation": {
+    "enabled": false,
+    "enforce_mixture_consistency": true,
+    "every_n_steps": 1,
+    "teacher": "htdemucs_ft",
+    "weight": 0.0
+  },
+  "execution": {
+    "argv": [
+      "scripts/train.py",
+      "--config",
+      "configs/remote/fp32_complex_mask.yaml",
+      "--data-root",
+      "<redacted-absolute-path>",
+      "--output-dir",
+      "<redacted-absolute-path>",
+      "--device",
+      "cuda",
+      "--require-cuda",
+      "--workers",
+      "4"
+    ],
+    "data_root": "<redacted-absolute-path>",
+    "workers": 4
+  },
+  "git_commit": "497d4f9aec2d01b9902aa53a428570b28936891c",
+  "git_dirty": false,
+  "host": {
+    "cpu_count": 255,
+    "cuda_available": true,
+    "device": "cuda",
+    "gpu_model": "NVIDIA GeForce RTX 5090",
+    "machine": "x86_64",
+    "platform": "Linux-6.8.0-59-generic-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.13"
+  },
+  "initialization": {
+    "checkpoint": null,
+    "checkpoint_sha256": null,
+    "missing_quantizer_state": [],
+    "mode": "scratch",
+    "start_epoch": 0
+  },
+  "mixed_precision_training": "off",
+  "packed_model_sha256": null,
+  "quality": null,
+  "record_redactions": {
+    "applied_for_version_control": true,
+    "fields": [
+      "execution.argv absolute path arguments",
+      "execution.data_root"
+    ],
+    "reason": "absolute runtime paths are not required for scientific interpretation"
+  },
+  "runtime": null,
+  "schema_version": 3,
+  "seed": 20250218,
+  "software": {
+    "cuda": "12.8",
+    "demucs": null,
+    "musdb": null,
+    "museval": null,
+    "numpy": "2.4.6",
+    "pytorch": "2.11.0+cu128",
+    "pyyaml": "6.0.3",
+    "soundfile": "0.14.0"
+  },
+  "split_sha256": "d4111b45f8b03291b88e9ed2aabe176696d26ed6133947e318de6882b30bd41f",
+  "training": [
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.19130723057985305,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 0,
+      "epoch_seconds": 189.16775450797286,
+      "gradient_norm": 0.4169186464965344,
+      "learning_rate": 0.0003,
+      "loss": 0.28549253070652486,
+      "next_learning_rate": 0.00029992845125303107,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -3.9006179350972174,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.318600585016945,
+      "training_seconds": 187.55180913000368,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 3.315106591821043,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -1.9089762737556784,
+        "per_stem_global_sdr": {
+          "bass": 3.8577869229671222,
+          "drums": 3.669247079041283,
+          "other": 2.3425007856388875,
+          "vocals": 3.3908915796368797
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 0.22338279235352557,
+          "drums": 0.7599320531003423,
+          "other": 1.9697539583696617,
+          "vocals": -10.588973898846243
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.028232187782566167,
+          "drums": 0.024738542496637102,
+          "other": 0.03528947870834296,
+          "vocals": 0.025903206895533024
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 3.315106591821043,
+      "validation_seconds": 1.6149982149945572,
+      "validation_waveform_l1": 0.028540853970769813,
+      "waveform_l1": 0.02696134368032217
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.16267341051250697,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 1,
+      "epoch_seconds": 186.57664609601488,
+      "gradient_norm": 0.348749703425169,
+      "learning_rate": 0.00029992845125303107,
+      "loss": 0.24158240357339383,
+      "next_learning_rate": 0.00029971387562209936,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -1.9437166750073434,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.077694780125086,
+      "training_seconds": 184.91912498598685,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 3.9351268983306,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -1.2171861753714261,
+        "per_stem_global_sdr": {
+          "bass": 4.255656606024207,
+          "drums": 4.352832136816041,
+          "other": 2.8925843333431493,
+          "vocals": 4.239434517139003
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 0.6919251671940513,
+          "drums": 1.648088513096121,
+          "other": 2.5393740731626226,
+          "vocals": -9.7481324549385
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.026938366621518262,
+          "drums": 0.022423261351209273,
+          "other": 0.03313721442874357,
+          "vocals": 0.023575391502689173
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 3.9351268983306,
+      "validation_seconds": 1.656870964972768,
+      "validation_waveform_l1": 0.02651855847604007,
+      "waveform_l1": 0.02294453219100833
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1534771827042103,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 2,
+      "epoch_seconds": 189.693073642964,
+      "gradient_norm": 0.3187748186022043,
+      "learning_rate": 0.00029971387562209936,
+      "loss": 0.22712046277821063,
+      "next_learning_rate": 0.00029935648486744657,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -1.5595166317701339,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.15423713178871,
+      "training_seconds": 188.13175655604573,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.133271735834455,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -0.9883079608482901,
+        "per_stem_global_sdr": {
+          "bass": 4.2061375297649555,
+          "drums": 4.401359088888891,
+          "other": 3.21700090208316,
+          "vocals": 4.7085894226008165
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 0.8953782884415968,
+          "drums": 1.6691160282359745,
+          "other": 2.8300626720074606,
+          "vocals": -9.347788832078193
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02722555187529959,
+          "drums": 0.02303075719736021,
+          "other": 0.032142357004390366,
+          "vocals": 0.022302850057893207
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.133271735834455,
+      "validation_seconds": 1.5602518509840593,
+      "validation_waveform_l1": 0.026175379033735843,
+      "waveform_l1": 0.021449812457896768
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.14876505895107983,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 3,
+      "epoch_seconds": 190.39191357500385,
+      "gradient_norm": 0.2979000011444092,
+      "learning_rate": 0.00029935648486744657,
+      "loss": 0.2195988665342331,
+      "next_learning_rate": 0.00029885663169059926,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -1.1104804175019265,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.99365189039949,
+      "training_seconds": 188.70184716995573,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.550004011338141,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -0.7458890257299384,
+        "per_stem_global_sdr": {
+          "bass": 4.262464359852351,
+          "drums": 5.000030282292949,
+          "other": 3.58125394729118,
+          "vocals": 5.356267455916082
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 0.7479194632498262,
+          "drums": 2.3805155721213596,
+          "other": 3.1669210011297633,
+          "vocals": -9.278912139420703
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.026674719197782915,
+          "drums": 0.02096445007739996,
+          "other": 0.030894156767581834,
+          "vocals": 0.021436338082390777
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.550004011338141,
+      "validation_seconds": 1.6890132930129766,
+      "validation_waveform_l1": 0.02499241603128887,
+      "waveform_l1": 0.020596271960809827
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.14446896023899317,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 4,
+      "epoch_seconds": 185.2716240590089,
+      "gradient_norm": 0.29656576268076895,
+      "learning_rate": 0.00029885663169059926,
+      "loss": 0.2125912826836109,
+      "next_learning_rate": 0.0002982148093862949,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -0.5645080797433853,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.44981035566415,
+      "training_seconds": 183.65536876401166,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.751888378297887,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -0.41395156051412224,
+        "per_stem_global_sdr": {
+          "bass": 4.712022816239691,
+          "drums": 5.214913747050067,
+          "other": 3.6621247821053644,
+          "vocals": 5.418492167796426
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.0822409605055194,
+          "drums": 2.5989847649878843,
+          "other": 3.326681934124307,
+          "vocals": -8.6637139016742
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02581942746881259,
+          "drums": 0.020719779276872657,
+          "other": 0.03056815063893472,
+          "vocals": 0.020793117421588476
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.751888378297887,
+      "validation_seconds": 1.615413860999979,
+      "validation_waveform_l1": 0.024475118701552112,
+      "waveform_l1": 0.019685394365713
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.14099212169498204,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 5,
+      "epoch_seconds": 186.8306944880169,
+      "gradient_norm": 0.2935052808403969,
+      "learning_rate": 0.0002982148093862949,
+      "loss": 0.2071874006897211,
+      "next_learning_rate": 0.0002974316513556598,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -0.31577632911205294,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.96165136600338,
+      "training_seconds": 185.31678973598173,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.895650174711244,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -0.21153288379358964,
+        "per_stem_global_sdr": {
+          "bass": 4.932018847035941,
+          "drums": 5.335552527281501,
+          "other": 3.7867805396917453,
+          "vocals": 5.528248784835789
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.5982075661309068,
+          "drums": 2.4707047829266333,
+          "other": 3.584246260678159,
+          "vocals": -8.499290144910058
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024817493538588982,
+          "drums": 0.020444656547421843,
+          "other": 0.02998461592193518,
+          "vocals": 0.02043939527160046
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.895650174711244,
+      "validation_seconds": 1.5129881469765678,
+      "validation_waveform_l1": 0.023921540319886615,
+      "waveform_l1": 0.019150434025935827
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.13806076741069556,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 6,
+      "epoch_seconds": 189.34815633995458,
+      "gradient_norm": 0.28690424272119996,
+      "learning_rate": 0.0002974316513556598,
+      "loss": 0.20261215557456017,
+      "next_learning_rate": 0.0002965079304811183,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": -0.10933712968826294,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.25637842491058,
+      "training_seconds": 187.77093553403392,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.977156043118452,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": -0.08108398578851633,
+        "per_stem_global_sdr": {
+          "bass": 5.052825948824362,
+          "drums": 5.534976466644633,
+          "other": 3.7769277398437486,
+          "vocals": 5.543894017161063
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.6295277192367472,
+          "drums": 2.8966394550144727,
+          "other": 3.6068922647724087,
+          "vocals": -8.457395382177694
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024630203770164952,
+          "drums": 0.019857556810475557,
+          "other": 0.029969851427627602,
+          "vocals": 0.020384515005588705
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.977156043118452,
+      "validation_seconds": 1.5764627190073952,
+      "validation_waveform_l1": 0.023710531753464204,
+      "waveform_l1": 0.01863358905352652
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.13665067359507083,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 7,
+      "epoch_seconds": 189.46206477598753,
+      "gradient_norm": 0.29225923974514006,
+      "learning_rate": 0.0002965079304811183,
+      "loss": 0.20036249039769172,
+      "next_learning_rate": 0.00029544455836365144,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.021356434440612793,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.212675521148874,
+      "training_seconds": 187.92514945100993,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 4.961084915109969,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.10045831241396141,
+        "per_stem_global_sdr": {
+          "bass": 4.774749460684852,
+          "drums": 5.59275565291331,
+          "other": 3.7485358768154664,
+          "vocals": 5.7282986700262475
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.4894250943177938,
+          "drums": 2.930237719264067,
+          "other": 3.627686592098648,
+          "vocals": -7.645516156024663
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.025216213016351633,
+          "drums": 0.01981421476449675,
+          "other": 0.029890985019000362,
+          "vocals": 0.01964460202091694
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 4.961084915109969,
+      "validation_seconds": 1.5361506349872798,
+      "validation_waveform_l1": 0.02364150370519142,
+      "waveform_l1": 0.018406610607542097
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1356680614992976,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 8,
+      "epoch_seconds": 189.7313467799686,
+      "gradient_norm": 0.2915604224294424,
+      "learning_rate": 0.00029544455836365144,
+      "loss": 0.19857399399876594,
+      "next_learning_rate": 0.0002942425844231567,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.15606614937782287,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.14852520043191,
+      "training_seconds": 188.15197528601857,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.029892402961453,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.03811088727320683,
+        "per_stem_global_sdr": {
+          "bass": 4.954677044305898,
+          "drums": 5.582428533774327,
+          "other": 3.8973055383505546,
+          "vocals": 5.685158495415034
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.6269635603408708,
+          "drums": 2.971885689319855,
+          "other": 3.6553398678189533,
+          "vocals": -8.101745568386852
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024653236448145235,
+          "drums": 0.019696484305026244,
+          "other": 0.029627340395456826,
+          "vocals": 0.01991957717560596
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.029892402961453,
+      "validation_seconds": 1.5784540160093457,
+      "validation_waveform_l1": 0.023474159581058567,
+      "waveform_l1": 0.018090624380484224
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.13451172060519456,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 9,
+      "epoch_seconds": 185.62524110003142,
+      "gradient_norm": 0.2899765988439322,
+      "learning_rate": 0.0002942425844231567,
+      "loss": 0.19667279386222364,
+      "next_learning_rate": 0.0002929031948627972,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.23491408808231354,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.32731423842447,
+      "training_seconds": 184.0694711340475,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.159839545731231,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.4353856168491097,
+        "per_stem_global_sdr": {
+          "bass": 5.114865484788977,
+          "drums": 5.947596365324289,
+          "other": 3.8678671437780725,
+          "vocals": 5.709029189033585
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.0199197051163105,
+          "drums": 3.388218124366444,
+          "other": 3.9112302683511544,
+          "vocals": -7.57782563043747
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024215876705379873,
+          "drums": 0.019019295179120127,
+          "other": 0.029324220426926548,
+          "vocals": 0.019549319834872316
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.159839545731231,
+      "validation_seconds": 1.554969418037217,
+      "validation_waveform_l1": 0.023027178036574718,
+      "waveform_l1": 0.017843982679210602
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1325181023463607,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 10,
+      "epoch_seconds": 185.97558368497994,
+      "gradient_norm": 0.2867629298776388,
+      "learning_rate": 0.0002929031948627972,
+      "loss": 0.19361942708790303,
+      "next_learning_rate": 0.00029142771149836264,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.4404956315755844,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.218865419688086,
+      "training_seconds": 184.4376477189944,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.144476443844099,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.11872920268845083,
+        "per_stem_global_sdr": {
+          "bass": 5.072521473153716,
+          "drums": 5.855303945066695,
+          "other": 3.873049414981761,
+          "vocals": 5.777030942174225
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.9312892863522266,
+          "drums": 3.3367695854680464,
+          "other": 3.757708718510618,
+          "vocals": -8.550850779577088
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02425761832376029,
+          "drums": 0.01908117939718086,
+          "other": 0.029484199923698665,
+          "vocals": 0.020001523196680228
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.144476443844099,
+      "validation_seconds": 1.5371192480088212,
+      "validation_waveform_l1": 0.023206130210330012,
+      "waveform_l1": 0.017554673164896666
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.13344827946871518,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 11,
+      "epoch_seconds": 190.7963069420075,
+      "gradient_norm": 0.28727689563333986,
+      "learning_rate": 0.00029142771149836264,
+      "loss": 0.1948687877237797,
+      "next_learning_rate": 0.00028981759045379636,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.7389459709644317,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.838684431736034,
+      "training_seconds": 189.255279679026,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.058432193623405,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.3275729835741479,
+        "per_stem_global_sdr": {
+          "bass": 5.090839935940864,
+          "drums": 5.629839607795141,
+          "other": 3.889020796128431,
+          "vocals": 5.624028434629183
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.939833834597592,
+          "drums": 3.21767935229939,
+          "other": 3.79974182849484,
+          "vocals": -7.6469630810952305
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024158279127197195,
+          "drums": 0.019453927402417394,
+          "other": 0.02937794926705449,
+          "vocals": 0.01952581835915676
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.058432193623405,
+      "validation_seconds": 1.5402612100006081,
+      "validation_waveform_l1": 0.02312899353895646,
+      "waveform_l1": 0.017633243351615965
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12963257295042277,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 12,
+      "epoch_seconds": 187.1228659679764,
+      "gradient_norm": 0.2814626795977354,
+      "learning_rate": 0.00028981759045379636,
+      "loss": 0.1891865126594901,
+      "next_learning_rate": 0.00028807442072417716,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.6740486707687378,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.91096997324472,
+      "training_seconds": 185.49100498401094,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.238290101188136,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.4184770733975076,
+        "per_stem_global_sdr": {
+          "bass": 5.22788167305551,
+          "drums": 5.794341869836071,
+          "other": 4.016787487817603,
+          "vocals": 5.914149374043362
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.2373434993344197,
+          "drums": 3.2272679812531773,
+          "other": 3.918939971583087,
+          "vocals": -7.709643158580653
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023728627938145744,
+          "drums": 0.019275751943774344,
+          "other": 0.028946004064665746,
+          "vocals": 0.019264365461356764
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.238290101188136,
+      "validation_seconds": 1.6311472189845517,
+      "validation_waveform_l1": 0.02280368735198565,
+      "waveform_l1": 0.017094687404483555
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.13048449393361808,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 13,
+      "epoch_seconds": 187.48115295299795,
+      "gradient_norm": 0.2828545273721218,
+      "learning_rate": 0.00028807442072417716,
+      "loss": 0.1902999817326665,
+      "next_learning_rate": 0.00028619992260757275,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.8555620070934296,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.831507277222855,
+      "training_seconds": 185.76481517602224,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.256645039083715,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5216449367227067,
+        "per_stem_global_sdr": {
+          "bass": 5.104911458535323,
+          "drums": 5.7263636927435355,
+          "other": 4.193531967608962,
+          "vocals": 6.0017730374470375
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.0610940970685183,
+          "drums": 3.404664318883457,
+          "other": 4.048566449443303,
+          "vocals": -7.427745118504451
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023961643009954518,
+          "drums": 0.01924599318606523,
+          "other": 0.02845740421356004,
+          "vocals": 0.019012872959906283
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.256645039083715,
+      "validation_seconds": 1.7156050060293637,
+      "validation_waveform_l1": 0.022669478342371516,
+      "waveform_l1": 0.017178608298115433
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12943347925245763,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 14,
+      "epoch_seconds": 195.08697228401434,
+      "gradient_norm": 0.2728468467324972,
+      "learning_rate": 0.00028619992260757275,
+      "loss": 0.1885106363967061,
+      "next_learning_rate": 0.0002841959460073133,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.9663006148338318,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 51.75024400982399,
+      "training_seconds": 193.23580383701483,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.2494102408700165,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5601745373768591,
+        "per_stem_global_sdr": {
+          "bass": 5.392786548312133,
+          "drums": 6.052429718688321,
+          "other": 3.8653077815136823,
+          "vocals": 5.687116914965928
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.417940069812812,
+          "drums": 3.673093244094613,
+          "other": 3.8342915062364575,
+          "vocals": -7.6846266706364466
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023333377927765374,
+          "drums": 0.018632995145187164,
+          "other": 0.029375753747636787,
+          "vocals": 0.019466090176870742
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.2494102408700165,
+      "validation_seconds": 1.850490198994521,
+      "validation_waveform_l1": 0.022702054249365018,
+      "waveform_l1": 0.01689099100753665
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12894839353859425,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 15,
+      "epoch_seconds": 185.7809505580226,
+      "gradient_norm": 0.27745473996698855,
+      "learning_rate": 0.0002841959460073133,
+      "loss": 0.18777508979141713,
+      "next_learning_rate": 0.00028206446860636015,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.811612080359459,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.273156516899256,
+      "training_seconds": 184.25314910302404,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.307409506967554,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5154868758080753,
+        "per_stem_global_sdr": {
+          "bass": 5.283447556770335,
+          "drums": 5.947489175253437,
+          "other": 4.071573981164215,
+          "vocals": 5.927127314682229
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.207669994741254,
+          "drums": 3.643287777984132,
+          "other": 4.10811780050487,
+          "vocals": -7.897128069997955
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023513744301623604,
+          "drums": 0.01875491041787761,
+          "other": 0.028705547383989824,
+          "vocals": 0.019203222239724857
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.307409506967554,
+      "validation_seconds": 1.5271702950121835,
+      "validation_waveform_l1": 0.022544356085803973,
+      "waveform_l1": 0.01684525003861636
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1289051305308938,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 16,
+      "epoch_seconds": 189.28560643497622,
+      "gradient_norm": 0.2737517720937729,
+      "learning_rate": 0.00028206446860636015,
+      "loss": 0.18759087636470795,
+      "next_learning_rate": 0.0002798075939155718,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.7706993926286697,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.46122044669065,
+      "training_seconds": 187.05147238401696,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.158425512371901,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5959272579476785,
+        "per_stem_global_sdr": {
+          "bass": 5.097420831216573,
+          "drums": 5.7485497485812225,
+          "other": 3.916304566964218,
+          "vocals": 5.87142690272559
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.1218250402231935,
+          "drums": 3.4652856540454287,
+          "other": 3.9945652414172668,
+          "vocals": -7.197966903895175
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02400944017653653,
+          "drums": 0.019106997078147947,
+          "other": 0.029134532785476917,
+          "vocals": 0.018965463013978678
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.158425512371901,
+      "validation_seconds": 2.2332578499917872,
+      "validation_waveform_l1": 0.022804108263535017,
+      "waveform_l1": 0.01677654414884746
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12777735658809541,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 17,
+      "epoch_seconds": 192.48284721001983,
+      "gradient_norm": 0.2685038106650114,
+      "learning_rate": 0.0002798075939155718,
+      "loss": 0.18588999844789506,
+      "next_learning_rate": 0.0002774275491977922,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 0.9875569504737854,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.48415744938625,
+      "training_seconds": 190.53368646802846,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.048502458242964,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5868702861518182,
+        "per_stem_global_sdr": {
+          "bass": 5.026470510246114,
+          "drums": 5.834237545933547,
+          "other": 3.6987138894193956,
+          "vocals": 5.634587887372798
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.007882782553964,
+          "drums": 3.436735893081602,
+          "other": 3.943208710662725,
+          "vocals": -7.040346241691018
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02423468247727016,
+          "drums": 0.01910692292742495,
+          "other": 0.029721632395820846,
+          "vocals": 0.01930854229506433
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.048502458242964,
+      "validation_seconds": 1.9480084629612975,
+      "validation_waveform_l1": 0.02309294502389507,
+      "waveform_l1": 0.01662351265847683
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1273708837389946,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 18,
+      "epoch_seconds": 187.9796186860185,
+      "gradient_norm": 0.26310249509215355,
+      "learning_rate": 0.0002774275491977922,
+      "loss": 0.1851386030048132,
+      "next_learning_rate": 0.00027492668326981143,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.0561658390760422,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.637592341022525,
+      "training_seconds": 186.4364070710144,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.313986558393908,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.8313615521109189,
+        "per_stem_global_sdr": {
+          "bass": 5.348228494338167,
+          "drums": 6.030007380683292,
+          "other": 4.039015742811997,
+          "vocals": 5.838694615742176
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.5412463101199996,
+          "drums": 3.6911594212362138,
+          "other": 4.159702985705699,
+          "vocals": -7.066662508618236
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02320714606656712,
+          "drums": 0.018473681227497492,
+          "other": 0.02860558774886763,
+          "vocals": 0.019126761289372244
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.313986558393908,
+      "validation_seconds": 1.542488542967476,
+      "validation_waveform_l1": 0.02235329408307612,
+      "waveform_l1": 0.016477452238835396
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12794268428236247,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 19,
+      "epoch_seconds": 186.3768600790063,
+      "gradient_norm": 0.2648467830181122,
+      "learning_rate": 0.00027492668326981143,
+      "loss": 0.18594629708230495,
+      "next_learning_rate": 0.00027230746418436733,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.076330907201767,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.095515410372855,
+      "training_seconds": 184.85820726800011,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.230229227110135,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.7156868680124,
+        "per_stem_global_sdr": {
+          "bass": 5.417314419828241,
+          "drums": 5.847038738761632,
+          "other": 3.9680762299988332,
+          "vocals": 5.688487519851834
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.3230537077210824,
+          "drums": 3.4339155364206544,
+          "other": 4.027364372240088,
+          "vocals": -6.921586144332225
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023100685134454742,
+          "drums": 0.019015243277267585,
+          "other": 0.028841229848194976,
+          "vocals": 0.019195423736893296
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.230229227110135,
+      "validation_seconds": 1.5177310850122012,
+      "validation_waveform_l1": 0.02253814549920265,
+      "waveform_l1": 0.016548973830230535
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12586339326649904,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 20,
+      "epoch_seconds": 186.83037654397776,
+      "gradient_norm": 0.2582501523762941,
+      "learning_rate": 0.00027230746418436733,
+      "loss": 0.18295425094366075,
+      "next_learning_rate": 0.00026957247679447504,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.3614954318523407,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.16716678347691,
+      "training_seconds": 184.61368009098805,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.2775567294562045,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.48826957241225677,
+        "per_stem_global_sdr": {
+          "bass": 5.067612647061626,
+          "drums": 5.939841023220361,
+          "other": 4.017827199074315,
+          "vocals": 6.084946048468516
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.115713977070764,
+          "drums": 3.5463627336147705,
+          "other": 4.1196137263989145,
+          "vocals": -7.828612147435422
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023897350557743842,
+          "drums": 0.018842859855638897,
+          "other": 0.028788772066576155,
+          "vocals": 0.019143631158612087
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.2775567294562045,
+      "validation_seconds": 2.2157998829497956,
+      "validation_waveform_l1": 0.022668153409642747,
+      "waveform_l1": 0.016326699584536253
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12534934314042329,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 21,
+      "epoch_seconds": 186.89636715699453,
+      "gradient_norm": 0.25727713935673235,
+      "learning_rate": 0.00026957247679447504,
+      "loss": 0.1820595333278179,
+      "next_learning_rate": 0.00026672442020248937,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.102996685051918,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.954373589460545,
+      "training_seconds": 185.34178667498054,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.304319718432838,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.7774805660139578,
+        "per_stem_global_sdr": {
+          "bass": 5.298479237281609,
+          "drums": 5.942913129107533,
+          "other": 4.04160364371142,
+          "vocals": 5.934282863630791
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.5253876854065407,
+          "drums": 3.722374094402118,
+          "other": 4.276679818807045,
+          "vocals": -7.4145193345598726
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023406371853430485,
+          "drums": 0.01885078904525156,
+          "other": 0.028642217079724076,
+          "vocals": 0.019019110977322447
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.304319718432838,
+      "validation_seconds": 1.5539302470278926,
+      "validation_waveform_l1": 0.022479622238932143,
+      "waveform_l1": 0.016170153607055544
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12576538580954075,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 22,
+      "epoch_seconds": 189.1905029589543,
+      "gradient_norm": 0.25042002107203004,
+      "learning_rate": 0.00026672442020248937,
+      "loss": 0.18262418072223663,
+      "next_learning_rate": 0.00026376610509641656,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.3407856526851654,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.2893019888884,
+      "training_seconds": 187.6549255999853,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.337184048293819,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.7088334616402613,
+        "per_stem_global_sdr": {
+          "bass": 5.193080581826873,
+          "drums": 6.06650988814589,
+          "other": 4.064112890983262,
+          "vocals": 6.02503283221925
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.2763844028348057,
+          "drums": 3.511750702297365,
+          "other": 4.058821939934133,
+          "vocals": -7.011623198505259
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023733380547779178,
+          "drums": 0.01853136160179851,
+          "other": 0.028655699516335398,
+          "vocals": 0.01868735005891957
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.337184048293819,
+      "validation_seconds": 1.5348511619959027,
+      "validation_waveform_l1": 0.022401947931208165,
+      "waveform_l1": 0.016226407450810075
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12524651173502208,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 23,
+      "epoch_seconds": 189.90735724003753,
+      "gradient_norm": 0.2529136315047741,
+      "learning_rate": 0.00026376610509641656,
+      "loss": 0.18167860321700574,
+      "next_learning_rate": 0.0002607004509761046,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.304271038377285,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.09204360399796,
+      "training_seconds": 188.35213943896815,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.447996425849241,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.9204646396324224,
+        "per_stem_global_sdr": {
+          "bass": 5.431549559296539,
+          "drums": 5.980548272044994,
+          "other": 4.256811633814589,
+          "vocals": 6.1230762382408415
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.320981178682286,
+          "drums": 3.742707762110654,
+          "other": 4.248498186289159,
+          "vocals": -6.630328568552409
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02314691066998771,
+          "drums": 0.018733866602892217,
+          "other": 0.028135725167906883,
+          "vocals": 0.018441658758853487
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.447996425849241,
+      "validation_seconds": 1.554209943045862,
+      "validation_waveform_l1": 0.022114540299910074,
+      "waveform_l1": 0.016049639482982457
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12541391103118657,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 24,
+      "epoch_seconds": 190.18392474297434,
+      "gradient_norm": 0.24978620816469194,
+      "learning_rate": 0.0002607004509761046,
+      "loss": 0.18187099838256837,
+      "next_learning_rate": 0.0002575304832720493,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.2593572563409805,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.99182429691631,
+      "training_seconds": 188.70835516002262,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.334211824499892,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.6811554440535663,
+        "per_stem_global_sdr": {
+          "bass": 5.458133382164619,
+          "drums": 5.93937589764365,
+          "other": 3.957737054555801,
+          "vocals": 5.9816009636355
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.3775484548653707,
+          "drums": 3.4061773105297894,
+          "other": 4.145525765977393,
+          "vocals": -7.204629755158288
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023194077042424648,
+          "drums": 0.01938690112500173,
+          "other": 0.028924852759117783,
+          "vocals": 0.01899921568073682
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.334211824499892,
+      "validation_seconds": 1.474758855998516,
+      "validation_waveform_l1": 0.022626261651820245,
+      "waveform_l1": 0.016024059243034572
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12494830491989851,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 25,
+      "epoch_seconds": 190.55780787899857,
+      "gradient_norm": 0.24761147001683712,
+      "learning_rate": 0.0002575304832720493,
+      "loss": 0.1812635474011302,
+      "next_learning_rate": 0.0002542593303596598,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.4822042617797853,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.906753661977206,
+      "training_seconds": 189.01178597897524,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.340956836241454,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.6953011173040894,
+        "per_stem_global_sdr": {
+          "bass": 5.494190261902795,
+          "drums": 6.075513672589726,
+          "other": 4.0164191488503596,
+          "vocals": 5.777704261622936
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.3726052681481318,
+          "drums": 3.6571803373273335,
+          "other": 4.165581319425306,
+          "vocals": -7.414162455684414
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02295453422497436,
+          "drums": 0.018585763437348822,
+          "other": 0.02878690691246046,
+          "vocals": 0.019346668840644038
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.340956836241454,
+      "validation_seconds": 1.5451533729792573,
+      "validation_waveform_l1": 0.02241846835385692,
+      "waveform_l1": 0.01603764947578311
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12532602505534887,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 26,
+      "epoch_seconds": 188.63305519800633,
+      "gradient_norm": 0.24861768457889558,
+      "learning_rate": 0.0002542593303596598,
+      "loss": 0.18167070779949426,
+      "next_learning_rate": 0.00025089022047192943,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.395560647201538,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.46840044657075,
+      "training_seconds": 187.02635419199942,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.330213889690024,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.720562755593751,
+        "per_stem_global_sdr": {
+          "bass": 5.320234975277778,
+          "drums": 6.038012441064732,
+          "other": 4.036147447893477,
+          "vocals": 5.9264606945241125
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.3107089274133608,
+          "drums": 3.5805440033974736,
+          "other": 4.085821337436685,
+          "vocals": -7.094823245872515
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02322355208499748,
+          "drums": 0.018342285420845206,
+          "other": 0.02873119259735459,
+          "vocals": 0.018936431978587492
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.330213889690024,
+      "validation_seconds": 1.605743964028079,
+      "validation_waveform_l1": 0.02230836552044619,
+      "waveform_l1": 0.016022582093067467
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.1237123170800507,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 27,
+      "epoch_seconds": 188.2342562979902,
+      "gradient_norm": 0.24607186477184295,
+      "learning_rate": 0.00025089022047192943,
+      "loss": 0.17931021934077143,
+      "next_learning_rate": 0.00024742647851355997,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.3954383451223373,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.576966840671,
+      "training_seconds": 186.6473708699923,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.359080478055278,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.7958567006608852,
+        "per_stem_global_sdr": {
+          "bass": 5.373237768641742,
+          "drums": 5.987631707309103,
+          "other": 4.064657134544878,
+          "vocals": 6.010795301725388
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.259482176253189,
+          "drums": 3.4931968222273255,
+          "other": 4.133641864872176,
+          "vocals": -6.70289406070915
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023174096349270257,
+          "drums": 0.018561141869119856,
+          "other": 0.028600412215287748,
+          "vocals": 0.01858486104094371
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.359080478055278,
+      "validation_seconds": 1.5861719640088268,
+      "validation_waveform_l1": 0.022230127868655393,
+      "waveform_l1": 0.015804131952393802
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12408348684459924,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 28,
+      "epoch_seconds": 186.70070191501873,
+      "gradient_norm": 0.24298781950473786,
+      "learning_rate": 0.00024742647851355997,
+      "loss": 0.17975451433658599,
+      "next_learning_rate": 0.00024387152277968155,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.272560903096199,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 54.01016819582771,
+      "training_seconds": 185.15032139397226,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.302248182336399,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.5536862024443138,
+        "per_stem_global_sdr": {
+          "bass": 5.141923419954915,
+          "drums": 5.938041226245945,
+          "other": 4.020549733170176,
+          "vocals": 6.108478349974562
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.2460932141954517,
+          "drums": 3.6356898126457664,
+          "other": 4.115092057950181,
+          "vocals": -7.782130275014144
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.023618369482025916,
+          "drums": 0.018540452198630864,
+          "other": 0.02881656077031292,
+          "vocals": 0.019141056559167553
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.302248182336399,
+      "validation_seconds": 1.5494843029882759,
+      "validation_waveform_l1": 0.02252910975253431,
+      "waveform_l1": 0.015791330231539905
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.12365592775344848,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 29,
+      "epoch_seconds": 190.77911662199767,
+      "gradient_norm": 0.24455833561122417,
+      "learning_rate": 0.00024387152277968155,
+      "loss": 0.17918839562386274,
+      "next_learning_rate": 0.00024022886158240857,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.4087454641580581,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 52.84357846027264,
+      "training_seconds": 189.23775208595907,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.336341328060433,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.6804266131458495,
+        "per_stem_global_sdr": {
+          "bass": 5.040220897490637,
+          "drums": 6.214423720534478,
+          "other": 3.9270526627733595,
+          "vocals": 6.1636680314432555
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 2.1671355396354675,
+          "drums": 3.7386926867452646,
+          "other": 4.1558639157089825,
+          "vocals": -7.3399856895063165
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.024250213995932603,
+          "drums": 0.01831551166369138,
+          "other": 0.029119282405827,
+          "vocals": 0.018669040192007585
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.336341328060433,
+      "validation_seconds": 1.540586200018879,
+      "validation_waveform_l1": 0.022588512064364644,
+      "waveform_l1": 0.015794891088083386
+    },
+    {
+      "attempted_steps": 2500,
+      "complex_l1": 0.123641623416543,
+      "cuda_peak_allocated_gb": 5.385139465332031,
+      "cuda_peak_reserved_gb": 6.419921875,
+      "epoch": 30,
+      "epoch_seconds": 189.30671706295107,
+      "gradient_norm": 0.2306919606089592,
+      "learning_rate": 0.00024022886158240857,
+      "loss": 0.17915048920810223,
+      "next_learning_rate": 0.0002365020897885589,
+      "optimizer_steps": 2500,
+      "quantization": {
+        "coverage_of_all_parameters": 0.0,
+        "layers": [],
+        "ternary_weight_parameters": 0
+      },
+      "sdr": 1.4009599618911743,
+      "skipped_optimizer_steps": 0,
+      "training_chunks_per_second": 53.276656436797516,
+      "training_seconds": 187.69946668599732,
+      "validation_development_diagnostics": {
+        "equal_share_baseline": {
+          "definition": "mixture / number_of_sources",
+          "global_sdr": 1.245475225637232,
+          "mean_chunk_sdr": -5.222744585375733,
+          "per_stem_global_sdr": {
+            "bass": 1.3043943055860319,
+            "drums": 1.1786381475373342,
+            "other": 1.3438585000658063,
+            "vocals": 1.1550099493597548
+          },
+          "per_stem_mean_chunk_sdr": {
+            "bass": -3.07955673025972,
+            "drums": -2.9929422983914327,
+            "other": 0.2205236691741154,
+            "vocals": -15.039002982025895
+          },
+          "per_stem_waveform_l1": {
+            "bass": 0.041756328683269686,
+            "drums": 0.036687761135202245,
+            "other": 0.04261333544106787,
+            "vocals": 0.038885576023060205
+          }
+        },
+        "global_sdr": 5.260624948810506,
+        "label": "development diagnostics (not BSSEval)",
+        "mean_chunk_sdr": 0.6825260017333425,
+        "per_stem_global_sdr": {
+          "bass": 5.100555674602458,
+          "drums": 6.164980172636236,
+          "other": 3.9559394005097226,
+          "vocals": 5.821024547493606
+        },
+        "per_stem_mean_chunk_sdr": {
+          "bass": 1.8560416119652814,
+          "drums": 3.8164311731967757,
+          "other": 4.213517912304581,
+          "vocals": -7.155886690533268
+        },
+        "per_stem_waveform_l1": {
+          "bass": 0.02406079124957309,
+          "drums": 0.018207508091212146,
+          "other": 0.02888730795972246,
+          "vocals": 0.018985958355309713
+        },
+        "sdr_aggregation": "sum signal/error energy across chunks, then take ratio"
+      },
+      "validation_global_sdr": 5.260624948810506,
+      "validation_seconds": 1.606079260003753,
+      "validation_waveform_l1": 0.022535391413954352,
+      "waveform_l1": 0.015801001714542507
+    }
+  ]
+}

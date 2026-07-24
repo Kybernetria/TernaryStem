@@ -3,7 +3,7 @@ import soundfile as sf
 import torch
 from torch.utils.data import DataLoader
 
-from ternarystem.data import MUSDBChunkDataset, STEMS
+from ternarystem.data import STEMS, MUSDBChunkDataset
 
 
 def test_streaming_remix_is_reproducible_and_consistent(tmp_path):
@@ -13,15 +13,15 @@ def test_streaming_remix_is_reproducible_and_consistent(tmp_path):
         for stem_index, stem in enumerate(STEMS):
             audio = np.full((80, 2), 0.01 * (track_index + 1) * (stem_index + 1), np.float32)
             sf.write(directory / f"{stem}.wav", audio, 44100, subtype="FLOAT")
-    kwargs = dict(
-        root=tmp_path,
-        track_names=["track-a", "track-b"],
-        chunk_samples=64,
-        epoch_chunks=2,
-        seed=7,
-        remix=True,
-        augment=True,
-    )
+    kwargs = {
+        "root": tmp_path,
+        "track_names": ["track-a", "track-b"],
+        "chunk_samples": 64,
+        "epoch_chunks": 2,
+        "seed": 7,
+        "remix": True,
+        "augment": True,
+    }
     first = MUSDBChunkDataset(**kwargs)
     second = MUSDBChunkDataset(**kwargs)
     mixture, sources = next(iter(first))
@@ -36,6 +36,34 @@ def test_streaming_remix_is_reproducible_and_consistent(tmp_path):
     assert not torch.equal(mixture, next_mixture)
 
 
+def test_validation_metadata_ids_are_ordered_and_worker_independent(tmp_path):
+    for track in ("track-a", "track-b"):
+        directory = tmp_path / track
+        directory.mkdir()
+        for stem in STEMS:
+            sf.write(directory / f"{stem}.wav", np.zeros((80, 2), np.float32), 44100)
+    kwargs = {
+        "root": tmp_path,
+        "track_names": ["track-a", "track-b"],
+        "chunk_samples": 32,
+        "epoch_chunks": 6,
+        "seed": 10,
+        "remix": False,
+        "augment": False,
+        "include_metadata": True,
+    }
+    dataset = MUSDBChunkDataset(**kwargs)
+    expected = dataset.ordered_sample_metadata()
+    single = list(DataLoader(dataset, num_workers=0))
+    multiple = list(DataLoader(MUSDBChunkDataset(**kwargs), num_workers=2))
+    assert [batch[2]["sample_id"][0] for batch in single] == [
+        item["sample_id"] for item in expected
+    ]
+    assert [batch[2]["sample_id"][0] for batch in multiple] == [
+        item["sample_id"] for item in expected
+    ]
+
+
 def test_samples_do_not_depend_on_data_loader_worker_count(tmp_path):
     for track_index, track in enumerate(("track-a", "track-b")):
         directory = tmp_path / track
@@ -44,15 +72,15 @@ def test_samples_do_not_depend_on_data_loader_worker_count(tmp_path):
             audio = np.arange(160, dtype=np.float32).reshape(80, 2)
             audio *= 0.0001 * (track_index + 1) * (stem_index + 1)
             sf.write(directory / f"{stem}.wav", audio, 44100, subtype="FLOAT")
-    kwargs = dict(
-        root=tmp_path,
-        track_names=["track-a", "track-b"],
-        chunk_samples=32,
-        epoch_chunks=6,
-        seed=9,
-        remix=True,
-        augment=True,
-    )
+    kwargs = {
+        "root": tmp_path,
+        "track_names": ["track-a", "track-b"],
+        "chunk_samples": 32,
+        "epoch_chunks": 6,
+        "seed": 9,
+        "remix": True,
+        "augment": True,
+    }
     single = list(DataLoader(MUSDBChunkDataset(**kwargs), num_workers=0))
     multiple = list(DataLoader(MUSDBChunkDataset(**kwargs), num_workers=2))
     assert len(single) == len(multiple)

@@ -19,8 +19,8 @@ import torch
 import torch.nn.functional as F
 
 from ternarystem.config import load_config, model_config
-from ternarystem.data import STEMS, validate_track_names
-from ternarystem.models import Separator
+from ternarystem.data import STEMS, validate_development_data_root, validate_track_names
+from ternarystem.models import architecture_identity, build_separator
 from ternarystem.training import atomic_json_save
 
 
@@ -57,6 +57,10 @@ if not args.config.is_file():
     fail(f"config does not exist: {args.config}")
 if not args.data_root.is_dir():
     fail(f"dataset directory does not exist: {args.data_root}")
+try:
+    args.data_root = validate_development_data_root(args.data_root)
+except ValueError as error:
+    fail(str(error))
 if not torch.cuda.is_available():
     fail("torch.cuda.is_available() is false; never pay for a silent CPU fallback")
 if torch.version.cuda is None:
@@ -132,7 +136,7 @@ except (OSError, subprocess.CalledProcessError) as error:
 resolved = model_config(config)
 device = torch.device("cuda")
 torch.manual_seed(int(config["seed"]))
-model = Separator(resolved).to(device)
+model = build_separator(config).to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=float(config["train"]["learning_rate"]))
 batch_size = int(config["train"]["batch_size"])
 samples = round(float(config["data"]["sample_rate"]) * float(config["data"]["chunk_seconds"]))
@@ -158,6 +162,7 @@ report = {
     "status": "passed",
     "created_utc": datetime.now(timezone.utc).isoformat(),
     "source": {"commit": commit, "dirty": bool(dirty_output)},
+    "architecture": architecture_identity(config),
     "config": str(args.config.resolve()),
     "data": {
         "root": str(args.data_root.resolve()),

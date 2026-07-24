@@ -2,6 +2,8 @@
 
 This runbook makes instance setup and completed-epoch recovery repeatable. It cannot guarantee that the model reaches the quality gates. A failed FP or ternary quality gate is a valid research result.
 
+> **Deployment #2 hold:** the original FP-to-sensitivity-to-QAT pipeline below is the deployment #1 procedure and must not be launched for the next rental. Deployment #1 stopped after 310,000 chunks at a best 5.4480 dB development `global_sdr`, below Gate 1. The next rental is `NO-GO` until every local prerequisite in `docs/DEPLOYMENT_2.md` passes. Deployment #2 is FP-only, compares frozen architecture candidates through cost-capped rungs, keeps the official test partition inaccessible, and has no sensitivity/QAT branch.
+
 ## 0. Frozen strategy before rental
 
 - Use one universal four-stem TFC-TDF model; no mixture of experts.

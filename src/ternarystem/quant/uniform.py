@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import math
 
-from torch import Tensor, nn
 import torch.nn.functional as F
+from torch import Tensor, nn
 
 from .activation import ActivationFakeQuant
 

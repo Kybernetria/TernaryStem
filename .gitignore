@@ -19,5 +19,7 @@ outputs/
 runs/
 .pi-search-cache/
 .vast.env
+.deployment2.env
+.deployment2-lock.json
 .xdp-*
 *.crdownload

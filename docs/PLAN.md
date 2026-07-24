@@ -1,14 +1,14 @@
 # TernaryStem Development Plan
 
-## 0. Execution Status (updated 2026-07-17)
+## 0. Execution Status (updated 2026-07-23)
 
-Phase 0 software scaffolding and initial x86-64 kernel probes are complete. The quality portion of Gate 0 remains unevaluated because MUSDB18-HQ training requires a remote GPU environment.
+Phase 0 software scaffolding and initial x86-64 kernel probes are complete. The first guarded Vast RTX 5090 baseline is now recorded in `results/remote/2026-07-23-vast-fp32-plateau/`: the 632,208-parameter FP32 complex-mask run stopped after 310,000 chunks; its best checkpoint occurred after 240,000 chunks at record epoch index 23 and reached 5.4480 dB development `global_sdr`, failing the 7.5 dB Gate 1 threshold. No QAT ran. Deployment #2 is frozen in `docs/DEPLOYMENT_2.md` as a MUSDB-only FP architecture screen with planned and absolute spend limits of $36 and $40. It remains `NO-GO` until all listed local prerequisites and tests pass.
 
 The deployment portion of Gate 0 has **not passed for an all-ternary runtime**. On an AMD Ryzen 7 7730U, an exact BitNet.cpp I2_S adapter ranged from 0.69x to 3.49x versus production FBGEMM INT8 and missed the required 1.3x speedup on four of five tested shapes. See `docs/GATE0_REPORT.md`.
 
 Consequently, development proceeds on two tracks:
 
-1. Continue ternary QAT as a quality research question.
+1. Continue ternary QAT as a future quality research question only after a checksum-pinned FP checkpoint passes Gate 1.
 2. Use selective per-layer deployment: BitNet I2_S only for shapes where it wins, W4A8/W8A8 for the remaining quantized core, and FP32 for sensitive boundaries/norms.
 
 No end-to-end latency or separation-quality claim has been established. A first remote MUSDB18-HQ development smoke run and matched continuation are recorded in `results/remote/2026-07-17-selective-ternary/`: selective TDF/bottleneck ternary QAT trailed its FP32 control by 0.0224 dB on diagnostic `global_sdr`, but the FP model itself remained at negative SDR and poor separation quality. This supports recoverable selective-QAT plumbing, not Gate 1 or Gate 2. The local training path now includes per-stem development diagnostics and an equal-share baseline, direct-estimate and bounded complex-mask output modes, resumable learning-rate scheduling, expanded environment/checkpoint metadata, and matched longer FP32 configurations. These additions have only synthetic/local test coverage; the next decisive milestone remains a capable remotely trained FP32 music-separation baseline, followed by matched W4A8/W8A8 and mixed-precision runs.
@@ -194,7 +194,7 @@ If the gate fails, retain the model work but pivot deployment experiments to W4A
 Proceed to expensive QAT when one joint model:
 
 - Produces all four stems without shape, phase, or overlap-add failures.
-- Reaches at least 7.5 dB overall SDR on the agreed development metric, or provides enough evidence that scaling the selected configuration will do so.
+- Has one checksum-pinned checkpoint that reaches at least 7.5 dB overall SDR on the agreed development metric and passes the frozen broader development-only confirmation.
 - Has a compute profile compatible with the latency target after plausible kernel speedups.
 
 If quality is insufficient, improve the floating-point architecture before introducing ternary error.
@@ -443,14 +443,13 @@ Use a local structured format as the source of truth; external tracking services
 
 ## 9. Immediate Next Actions
 
-1. Run the matched long-budget direct-estimate and bounded complex-mask FP32 configurations remotely, and compare both against their equal-share development baselines; the first remote smoke remained at negative diagnostic SDR.
-2. Use the now-recorded GPU/software metadata and latest/best checkpoint hashes, and verify exact scheduler resume on the remote host before committing a long run.
-3. Improve the FP architecture/training recipe based on per-stem development diagnostics until it produces meaningful separation; do not begin expensive QAT from another incapable FP baseline.
-4. Run W4A8 and W8A8 family sensitivity from the matched capable FP checkpoint, preserving projections in FP32.
-5. Repeat selective ternary QAT at 20%, 40%, and 60% zero targets and compare adaptive versus BitNet-style quantization only after the FP baseline is adequate.
-6. Train matched W4A8, W8A8, and mixed continuations selected by sensitivity, each with an equal-compute FP control.
-7. Train and profile the selected FP32 baseline before making broad deployment decisions.
-8. Add matched scale/bias/requantization to BitNet and FBGEMM comparisons and build per-shape selective dispatch.
-9. Implement and benchmark native offline-packed W4/W8 operator paths before making deployment-speed claims.
-10. Evaluate the best mixed-precision model against its matched FP32 checkpoint; do not touch the official test set until the recipe is frozen.
-11. Validate NEON economics on ARM hardware after x86 precision selection is stable.
+1. Treat `docs/DEPLOYMENT_2.md` as the locked contract for the next GPU rental; do not reuse the existing FP-to-QAT Vast pipeline unchanged.
+2. Add an architecture registry and common training/checkpoint/evaluation interface.
+3. Implement and locally verify the frozen 2–3M full-spectrum TernaryStem-v2 candidate and the pinned approximately 10.08M SCNet candidate, plus the 10k control sentinel.
+4. Add deterministic RNG-complete rung resume, stable validation identities, broader development-only confirmation, atomic sweep manifests, and a cumulative billed-time/dollar ledger.
+5. Fix the observed background lock cleanup before another remote launcher is used.
+6. Run deployment #2 as FP32 only under the planned $36 and absolute $40 limits; stop at every failed quality or cost gate.
+7. Do not run sensitivity or QAT unless one exact FP checkpoint first passes the 7.5 dB gate and broader development confirmation.
+8. Before any later QAT deployment, fix observer calibration, canonical sensitivity aggregation, saturation aggregation, and per-shape ternary/W4/W8/FP benchmarking.
+9. Build the complete native graph/runtime and validate end-to-end numerical agreement before making deployment-speed claims.
+10. Keep the official test partition untouched until architecture, precision map, checkpoint, and inference recipe are frozen.

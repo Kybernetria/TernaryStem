@@ -19,6 +19,27 @@ def test_development_diagnostics_include_stems_and_equal_share_baseline():
     assert result["per_stem_waveform_l1"]["vocals"] == 0
 
 
+def test_diagnostics_persist_ids_and_exact_per_track_float64_energies():
+    mixture = torch.ones(2, 2, 4)
+    targets = mixture[:, None].repeat(1, 4, 1, 1) / 4
+    estimates = targets.clone()
+    estimates[1, 0] += 0.5
+    diagnostics = DevelopmentDiagnostics(4)
+    diagnostics.update(
+        estimates,
+        targets,
+        mixture,
+        sample_ids=["sample-a", "sample-b"],
+        track_names=["track-a", "track-b"],
+    )
+    result = diagnostics.compute()
+    assert result["ordered_sample_ids"] == ["sample-a", "sample-b"]
+    assert set(result["per_track_float64_energies"]) == {"track-a", "track-b"}
+    assert result["per_track_float64_energies"]["track-a"]["error"]["vocals"] == 0
+    assert result["per_track_float64_energies"]["track-b"]["error"]["vocals"] == 2.0
+    assert result["float64_energies"]["error"]["vocals"] == 2.0
+
+
 def test_energy_aggregated_sdr_is_not_dominated_by_one_silent_chunk():
     diagnostics = DevelopmentDiagnostics(1)
     silent_target = torch.zeros(1, 1, 2, 8)

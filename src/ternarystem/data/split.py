@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from importlib.resources import files
 from pathlib import Path
-from typing import Iterable
 
 
 def _path() -> Path:
@@ -19,6 +19,24 @@ def load_split() -> dict:
 
 def split_hash() -> str:
     return hashlib.sha256(_path().read_bytes()).hexdigest()
+
+
+def validate_development_data_root(root: str | Path) -> Path:
+    """Reject any path that could expose the official MUSDB test partition."""
+    supplied = Path(root)
+    if supplied.name.casefold() != "train":
+        raise ValueError("data root must be the canonical MUSDB18-HQ train directory")
+    if supplied.is_symlink() or any(parent.is_symlink() for parent in supplied.parents):
+        raise ValueError("symlinked dataset paths are not allowed")
+    resolved = supplied.resolve(strict=False)
+    if resolved.name.casefold() != "train" or "test" in {
+        part.casefold() for part in resolved.parts
+    }:
+        raise ValueError("official MUSDB test paths are forbidden")
+    for sibling in resolved.parent.iterdir() if resolved.parent.is_dir() else ():
+        if sibling.name.casefold() == "test":
+            raise ValueError("official MUSDB test sibling must be absent from the training host")
+    return resolved
 
 
 def validate_track_names(track_names: Iterable[str]) -> tuple[list[str], list[str]]:

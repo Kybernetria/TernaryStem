@@ -26,8 +26,8 @@ __all__ = [
     "W8A8Linear",
     "fake_symmetric_weight",
     "fake_ternary",
+    "symmetric_weight_values",
     "ternary_stats",
     "ternary_values",
     "threshold_for_zero_ratio",
-    "symmetric_weight_values",
 ]

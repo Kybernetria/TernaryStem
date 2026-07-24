@@ -1,0 +1,39 @@
+seed: 20250218
+data:
+  sample_rate: 44100
+  chunk_seconds: 11.0
+  epoch_chunks: 10000
+  validation_chunks: 140
+model:
+  architecture: scnet_5d95bf96_adapted_v1
+  sources: [drums, bass, other, vocals]
+  audio_channels: 2
+  dims: [4, 32, 64, 128]
+  nfft: 4096
+  hop_size: 1024
+  win_size: 4096
+  normalized: true
+  band_SR: [0.175, 0.392, 0.433]
+  band_stride: [1, 4, 16]
+  band_kernel: [3, 4, 16]
+  conv_depths: [3, 2, 1]
+  compress: 4
+  conv_kernel: 3
+  num_dplayer: 6
+  expand: 1
+quant:
+  layer_precisions: {}
+train:
+  batch_size: 4
+  learning_rate: 0.0005
+  optimizer: adam
+  betas: [0.9, 0.999]
+  weight_decay: 0
+  epochs: 100
+  checkpoint_every: 5
+  scheduler:
+    name: step
+    step_size: 10
+    gamma: 0.98
+  amp: "off"
+  loss_profile: scnet_spec_rmse

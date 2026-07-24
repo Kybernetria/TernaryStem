@@ -1,0 +1,33 @@
+{
+  "command": "pytest -q tests/unit/test_serial_controller.py tests/unit/test_artifact_sync.py tests/unit/test_deployment_state.py tests/unit/test_process_supervision.py tests/unit/test_gates.py",
+  "coverage": [
+    "serial crash recovery at seven transaction phases",
+    "checkpoint/manifest corruption refusal",
+    "immutable generation staging and receipt-last publication",
+    "concurrent sync refusal",
+    "hash-chained cumulative ledger and cutoffs",
+    "verified receipt promotion requirement",
+    "PID/PGID/session identity, stale PID refusal, vanished-leader cleanup, TERM escalation",
+    "machine-readable gate boundaries and non-finite refusal"
+  ],
+  "created_utc": "2026-07-24T09:42:26.038031+00:00",
+  "environment": "Generalbox, CPU-only synthetic/fake processes and temporary directories",
+  "file_sha256": {
+    "src/ternarystem/deployment/controller.py": "bd3da400c51bf7a429156f3955cdc450ebbcdbe0ad5d0ff7a83659390180429f",
+    "src/ternarystem/deployment/gates.py": "775195ae670665ccfffdf198ce9322a45f3583dcd249084bf6484fd7e3240100",
+    "src/ternarystem/deployment/ledger.py": "1127e4b8b0da69bfebadd136d4cb5ae1648fd878c3ea2ee66748cd79d0778c18",
+    "src/ternarystem/deployment/process.py": "0ea4540092275ff43537e4d248ff4055be50f6ccadcbb48096decb8a7bffa9d4",
+    "src/ternarystem/deployment/state.py": "ef5a7524cef71d5f6da61bfbbcb31638e5c1e128dc6672e17c53a54f61b5d4f3",
+    "src/ternarystem/deployment/sync.py": "0c0690686190b0dc312c5da6e4611257ada9b3388214bd28aa35806bec674471",
+    "tests/unit/test_artifact_sync.py": "a0be05e9acade6b6a93c042e9f35e2e6405e6585265c32e1ab7925d335854ea5",
+    "tests/unit/test_deployment_state.py": "b1279880175847394519fef483b1143fa6e0eb13ec47aaffe81b506f4fcd879f",
+    "tests/unit/test_gates.py": "d5428d0dfe6e28b3ee093a8604e27b532c5d05aae1ea1801eaa6c18d73b08fc3",
+    "tests/unit/test_process_supervision.py": "5468289a8e05f22e16764784e55903cc3f377271d217bd21724aefa64a754014",
+    "tests/unit/test_serial_controller.py": "5ecf46e65edda0d02785877930b7e69291454d2244c95d3749ba493fa1d77be5"
+  },
+  "result": {
+    "failed": 0,
+    "passed": 31
+  },
+  "schema_version": 1
+}
