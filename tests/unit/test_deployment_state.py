@@ -15,7 +15,7 @@ def test_billing_ledger_is_cumulative_hash_chained_and_persistent(tmp_path):
     assert second["cumulative_seconds"] == 5400
     assert second["previous_sha256"] == first["event_sha256"]
     assert BillingLedger(path).totals().seconds == 5400
-    assert BillingLedger(path).totals().cents == 120
+    assert BillingLedger(path).totals().cents == 81
 
 
 def test_billing_transaction_is_idempotent_and_conflicts_fail_closed(tmp_path):
@@ -54,11 +54,12 @@ def test_billing_ledger_corruption_and_absolute_cutoff_fail_closed(tmp_path):
         ledger.totals()
 
     cutoff = BillingLedger(tmp_path / "cutoff.json")
-    assert cutoff.planned.seconds == 27_000
+    assert cutoff.cents_per_hour == 54
+    assert cutoff.planned.seconds == 39_934
     assert cutoff.planned.cents == 600
-    assert cutoff.absolute.seconds == 31_500
+    assert cutoff.absolute.seconds == 46_601
     assert cutoff.absolute.cents == 700
-    cutoff.append(category="training", duration_seconds=31_499, deployment_id="d2")
+    cutoff.append(category="training", duration_seconds=46_600, deployment_id="d2")
     with pytest.raises(ValueError, match="absolute"):
         cutoff.assert_within_absolute(1)
     assert not cutoff.has_planned_reserve(1)

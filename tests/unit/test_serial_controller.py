@@ -111,7 +111,7 @@ def test_checkpointed_resume_does_not_project_training_cost_twice(tmp_path):
 
 def test_controller_refuses_rung_when_policy_reserve_does_not_fit(tmp_path):
     controller = make_controller(tmp_path)
-    controller.ledger.append(category="setup", duration_seconds=26_300, deployment_id="d2")
+    controller.ledger.append(category="setup", duration_seconds=39_270, deployment_id="d2")
     assert controller.ledger.has_planned_reserve(60)
     with pytest.raises(ValueError, match="planned deployment budget"):
         controller.execute(

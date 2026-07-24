@@ -11,20 +11,20 @@
     "PID/PGID/session identity, stale PID refusal, vanished-leader cleanup, TERM escalation",
     "machine-readable gate boundaries and non-finite refusal"
   ],
-  "created_utc": "2026-07-24T11:10:42.470763+00:00",
-  "environment": "Google Colab, synthetic/fake processes and temporary directories; no audio data",
+  "created_utc": "2026-07-24T20:24:42.165282+00:00",
+  "environment": "Vast RTX 5090 instance, synthetic/fake processes and temporary directories; no audio data",
   "file_sha256": {
     "src/ternarystem/deployment/controller.py": "10a5f597b18ac4d7710c48a3bfbdcb71325b9948e57a140f981ce5dd04851faf",
     "src/ternarystem/deployment/gates.py": "775195ae670665ccfffdf198ce9322a45f3583dcd249084bf6484fd7e3240100",
-    "src/ternarystem/deployment/ledger.py": "9f939c8b9a9b948f6595cc1a23884e3324cd16898cd70eb627fc4fd7a49cc7f7",
+    "src/ternarystem/deployment/ledger.py": "bd717d11d534d525cd1b8046efcb1ef0737ffa88fe669721f2b9d997aac27c76",
     "src/ternarystem/deployment/process.py": "0ea4540092275ff43537e4d248ff4055be50f6ccadcbb48096decb8a7bffa9d4",
     "src/ternarystem/deployment/state.py": "ef5a7524cef71d5f6da61bfbbcb31638e5c1e128dc6672e17c53a54f61b5d4f3",
     "src/ternarystem/deployment/sync.py": "0c0690686190b0dc312c5da6e4611257ada9b3388214bd28aa35806bec674471",
     "tests/unit/test_artifact_sync.py": "a0be05e9acade6b6a93c042e9f35e2e6405e6585265c32e1ab7925d335854ea5",
-    "tests/unit/test_deployment_state.py": "8311bfcb36ff4a4ff92da02b8dbcc3e360ca8a0be427bb55be1536e36418c5b0",
+    "tests/unit/test_deployment_state.py": "779fa07dbfaac26a0f9e275442b9f55643ecb381acf93ac59c0c4910696aa8ae",
     "tests/unit/test_gates.py": "d5428d0dfe6e28b3ee093a8604e27b532c5d05aae1ea1801eaa6c18d73b08fc3",
     "tests/unit/test_process_supervision.py": "5468289a8e05f22e16764784e55903cc3f377271d217bd21724aefa64a754014",
-    "tests/unit/test_serial_controller.py": "077f95a65e2c18df7ae7516b6ec061d3cd84296dbddf728c6302eafa8578f291"
+    "tests/unit/test_serial_controller.py": "c45cc516e26645339ebbdc2ee9996064648ce001cad782f3d1e3a945dedc3125"
   },
   "result": {
     "failed": 0,

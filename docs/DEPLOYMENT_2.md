@@ -14,7 +14,7 @@ This deployment is **not** a QAT run and is not an official test evaluation. It 
 - record quality, parameters, operator shapes, VRAM, throughput, GPU-hours, and dollars;
 - stop when a pre-registered quality or cost gate fails;
 - never start sensitivity, PTQ, QAT, distillation, or an extra-data experiment;
-- plan for at most 7.5 billed instance-hours and stop absolutely before 8.75 billed hours at the approved $0.80/hour offer (`$6` planned, `$7` absolute).
+- plan for at most 11.09 billed instance-hours and stop absolutely before 12.94 billed hours at the approved $0.54/hour offer (`$6` planned, `$7` absolute).
 
 Every setup, preflight, retry, validation, synchronization, and idle minute counts against the persistent cumulative ledger. A restart must not reset it.
 
@@ -149,7 +149,7 @@ Pass requirements:
 - no reconstruction, silence, or shape failure;
 - measured VRAM, chunks/s, validation seconds, and operator inventory;
 - control C reproduces deployment #1's early curve within a predeclared tolerance;
-- projected worst-case deployment, including 20% overhead, fits within the 7.5-hour planned budget.
+- projected worst-case deployment, including 20% overhead, fits within the 11.09-hour planned budget.
 
 Do not eliminate A or B solely for early rank at 10k. Stop the deployment if either cannot fit the frozen physical/effective-batch contract or if the cost projection fails.
 
@@ -189,7 +189,7 @@ Otherwise stop and publish a negative result.
 
 ### Final continuation
 
-Only the selected system may continue, using the same optimizer, scheduler, samples, and checkpoint lineage. Stop at the first qualifying checkpoint or the planned 7.5-hour cutoff. The operator must terminate before 8.75 billed hours / $7 under all circumstances.
+Only the selected system may continue, using the same optimizer, scheduler, samples, and checkpoint lineage. Stop at the first qualifying checkpoint or the planned 11.09-hour cutoff. The operator must terminate before 12.94 billed hours / $7 under all circumstances.
 
 ## 7. Success and failure decisions
 

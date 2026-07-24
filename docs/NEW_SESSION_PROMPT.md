@@ -197,8 +197,8 @@ Stage 7 — gate policy, ledger, and serial runner
 
 - Create a versioned machine-readable gate policy implementing every locked paid-rung rule.
 - Add a deployment-wide append-only ledger covering setup, idle, validation, retry, and sync time across launches/replacements.
-- Planned cutoff: 7.5 billed hours / $6 at $0.80/hour.
-- Absolute cutoff: 8.75 billed hours / $7. Never let synchronization block absolute shutdown.
+- Planned cutoff: 11.09 billed hours / $6 at $0.54/hour.
+- Absolute cutoff: 12.94 billed hours / $7. Never let synchronization block absolute shutdown.
 - Use integer seconds/cents or another deterministic accounting convention.
 - Implement atomic states such as pending -> running -> checkpointed -> remotely_committed -> gate_passed/stopped.
 - Manifests include deployment/candidate/rung IDs, parent/checkpoint/config/provenance hashes, counters, metrics, decision, ledger snapshot, and sync receipt.

@@ -34,10 +34,10 @@ reserve:
   synchronization_seconds: 600
   formula: ceil(projected_remaining_seconds * 1.20) + synchronization_seconds
 budget:
-  approved_cents_per_hour: 80
-  planned_seconds: 27000
+  approved_cents_per_hour: 54
+  planned_seconds: 39934
   planned_cents: 600
-  absolute_seconds: 31500
+  absolute_seconds: 46601
   absolute_cents: 700
 rungs:
   commissioning:

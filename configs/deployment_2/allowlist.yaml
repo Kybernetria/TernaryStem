@@ -30,11 +30,11 @@ candidates:
     sha256: 8d0dcf68ea37b1a6560c04bb88815afd45ac9e30aa16684a92ffe618c1010e31
 gate_policy:
   path: configs/deployment_2/gate_policy.yaml
-  sha256: b7ccb88785e10d39f24a95b36f006c17997a8eb9bc932cbbe861d951911e3345
+  sha256: a27387e814af59ff853899f59b6753a095d1c45dce201c1155f4822299d7f990
 required_evidence:
   controller_fake_matrix:
     path: results/readiness/controller_fake_matrix.json
-    sha256: 1c109750b23f6a814dff10738482812c3f2464df5476d45229837cd9694a3588
+    sha256: be94697356a7e7be239493292488fd92925cfe560559a4d4bf7c5eab29acd83b
 provenance:
   scnet_document_sha256: 15c700b4c04093037e10ae455c1e34bf9136aafc6a1b9bf89f1ddf4ba3f62851
   scnet_tree_sha256: b0f5a840238d03f8fd9238d7cbda9967d9270339170dde293afa157610d98eb3

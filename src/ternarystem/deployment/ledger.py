@@ -24,10 +24,10 @@ class BillingLedger:
         self,
         path: str | Path,
         *,
-        cents_per_hour: int = 80,
-        planned_seconds: int = 27_000,
+        cents_per_hour: int = 54,
+        planned_seconds: int = 39_934,
         planned_cents: int = 600,
-        absolute_seconds: int = 31_500,
+        absolute_seconds: int = 46_601,
         absolute_cents: int = 700,
     ) -> None:
         self.path = Path(path)
