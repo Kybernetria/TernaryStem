@@ -323,7 +323,7 @@ def _probe_optimizer(candidate_id: str, model: torch.nn.Module, train: dict):
 
 def _state_equal(left, right) -> bool:
     if isinstance(left, torch.Tensor) and isinstance(right, torch.Tensor):
-        return torch.equal(left, right)
+        return torch.equal(left.detach().cpu(), right.detach().cpu())
     if isinstance(left, dict) and isinstance(right, dict):
         return left.keys() == right.keys() and all(
             _state_equal(left[key], right[key]) for key in left
