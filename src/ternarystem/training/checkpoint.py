@@ -63,7 +63,10 @@ def restore_rng_state(state: dict[str, Any]) -> None:
     if cuda_states:
         if not torch.cuda.is_available() or len(cuda_states) != torch.cuda.device_count():
             raise ValueError("checkpoint CUDA RNG state does not match available CUDA devices")
-        torch.cuda.set_rng_state_all(cuda_states)
+        # ``load_checkpoint(..., device="cuda")`` maps every tensor in the payload,
+        # including RNG snapshots, onto CUDA. PyTorch's generators require CPU
+        # ByteTensors here even when the generator itself is a CUDA generator.
+        torch.cuda.set_rng_state_all([state.cpu() for state in cuda_states])
 
 
 def deterministic_backend_state() -> dict[str, Any]:

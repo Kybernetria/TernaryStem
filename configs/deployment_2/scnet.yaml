@@ -24,7 +24,8 @@ model:
 quant:
   layer_precisions: {}
 train:
-  batch_size: 4
+  batch_size: 1
+  gradient_accumulation_steps: 4
   learning_rate: 0.0005
   optimizer: adam
   betas: [0.9, 0.999]

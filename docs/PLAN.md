@@ -2,7 +2,7 @@
 
 ## 0. Execution Status (updated 2026-07-23)
 
-Phase 0 software scaffolding and initial x86-64 kernel probes are complete. The first guarded Vast RTX 5090 baseline is now recorded in `results/remote/2026-07-23-vast-fp32-plateau/`: the 632,208-parameter FP32 complex-mask run stopped after 310,000 chunks; its best checkpoint occurred after 240,000 chunks at record epoch index 23 and reached 5.4480 dB development `global_sdr`, failing the 7.5 dB Gate 1 threshold. No QAT ran. Deployment #2 is frozen in `docs/DEPLOYMENT_2.md` as a MUSDB-only FP architecture screen with planned and absolute spend limits of $36 and $40. It remains `NO-GO` until all listed local prerequisites and tests pass.
+Phase 0 software scaffolding and initial x86-64 kernel probes are complete. The first guarded Vast RTX 5090 baseline is now recorded in `results/remote/2026-07-23-vast-fp32-plateau/`: the 632,208-parameter FP32 complex-mask run stopped after 310,000 chunks; its best checkpoint occurred after 240,000 chunks at record epoch index 23 and reached 5.4480 dB development `global_sdr`, failing the 7.5 dB Gate 1 threshold. No QAT ran. Deployment #2 is an MUSDB-only FP architecture screen with revised planned and absolute spend limits of $6 and $7. It remains `NO-GO` until all listed local prerequisites and tests pass.
 
 The deployment portion of Gate 0 has **not passed for an all-ternary runtime**. On an AMD Ryzen 7 7730U, an exact BitNet.cpp I2_S adapter ranged from 0.69x to 3.49x versus production FBGEMM INT8 and missed the required 1.3x speedup on four of five tested shapes. See `docs/GATE0_REPORT.md`.
 
@@ -448,7 +448,7 @@ Use a local structured format as the source of truth; external tracking services
 3. Implement and locally verify the frozen 2–3M full-spectrum TernaryStem-v2 candidate and the pinned approximately 10.08M SCNet candidate, plus the 10k control sentinel.
 4. Add deterministic RNG-complete rung resume, stable validation identities, broader development-only confirmation, atomic sweep manifests, and a cumulative billed-time/dollar ledger.
 5. Fix the observed background lock cleanup before another remote launcher is used.
-6. Run deployment #2 as FP32 only under the planned $36 and absolute $40 limits; stop at every failed quality or cost gate.
+6. Run deployment #2 as FP32 only under the planned $6 and absolute $7 limits; stop at every failed quality or cost gate.
 7. Do not run sensitivity or QAT unless one exact FP checkpoint first passes the 7.5 dB gate and broader development confirmation.
 8. Before any later QAT deployment, fix observer calibration, canonical sensitivity aggregation, saturation aggregation, and per-shape ternary/W4/W8/FP benchmarking.
 9. Build the complete native graph/runtime and validate end-to-end numerical agreement before making deployment-speed claims.

@@ -23,18 +23,18 @@ candidates:
   A:
     architecture: ternarystem_v2_fullband_temporal_v1
     config: configs/deployment_2/ternarystem_v2.yaml
-    sha256: b34b5cee2ec78e88d0828c39c75cf8cd4524a52e6ea0957ab22d2326ab4541c2
+    sha256: 9942fcb79b3270fec153ca1e6cd308948bed62c147ee412d4c1d187c850eae18
   B:
     architecture: scnet_5d95bf96_adapted_v1
     config: configs/deployment_2/scnet.yaml
-    sha256: 7a728da13d85bd557c5ebc9cce55dba66563bbf0bf8e4c2f4ae13a358ed73398
+    sha256: 8d0dcf68ea37b1a6560c04bb88815afd45ac9e30aa16684a92ffe618c1010e31
 gate_policy:
   path: configs/deployment_2/gate_policy.yaml
-  sha256: 856ce9f4c9ce0514df6e6459fbe292b3d5866a22f2306108ab02de0f3d83163c
+  sha256: b7ccb88785e10d39f24a95b36f006c17997a8eb9bc932cbbe861d951911e3345
 required_evidence:
   controller_fake_matrix:
     path: results/readiness/controller_fake_matrix.json
-    sha256: aa3350da9a31d1223e8eb59400c98a9e09c549f30a762230775ebdf2f2c1c1d0
+    sha256: 1c109750b23f6a814dff10738482812c3f2464df5476d45229837cd9694a3588
 provenance:
   scnet_document_sha256: 15c700b4c04093037e10ae455c1e34bf9136aafc6a1b9bf89f1ddf4ba3f62851
   scnet_tree_sha256: b0f5a840238d03f8fd9238d7cbda9967d9270339170dde293afa157610d98eb3

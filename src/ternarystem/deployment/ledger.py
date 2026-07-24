@@ -25,10 +25,10 @@ class BillingLedger:
         path: str | Path,
         *,
         cents_per_hour: int = 80,
-        planned_seconds: int = 162_000,
-        planned_cents: int = 3_600,
-        absolute_seconds: int = 180_000,
-        absolute_cents: int = 4_000,
+        planned_seconds: int = 27_000,
+        planned_cents: int = 600,
+        absolute_seconds: int = 31_500,
+        absolute_cents: int = 700,
     ) -> None:
         self.path = Path(path)
         self.cents_per_hour = cents_per_hour
@@ -38,6 +38,40 @@ class BillingLedger:
             raise ValueError("ledger limits must be positive integers")
         if planned_seconds >= absolute_seconds or planned_cents >= absolute_cents:
             raise ValueError("planned limits must be below absolute limits")
+
+    @classmethod
+    def from_gate_policy(cls, path: str | Path, policy: dict) -> "BillingLedger":
+        budget = policy.get("budget") if isinstance(policy, dict) else None
+        if not isinstance(budget, dict):
+            raise ValueError("gate policy budget is missing")
+        required = {
+            "approved_cents_per_hour",
+            "planned_seconds",
+            "planned_cents",
+            "absolute_seconds",
+            "absolute_cents",
+        }
+        if set(budget) != required or not all(
+            isinstance(budget[key], int) for key in required
+        ):
+            raise ValueError("gate policy budget is invalid")
+        return cls(
+            path,
+            cents_per_hour=budget["approved_cents_per_hour"],
+            planned_seconds=budget["planned_seconds"],
+            planned_cents=budget["planned_cents"],
+            absolute_seconds=budget["absolute_seconds"],
+            absolute_cents=budget["absolute_cents"],
+        )
+
+    def assert_matches_gate_policy(self, policy: dict) -> None:
+        expected = type(self).from_gate_policy(self.path, policy)
+        if (
+            self.cents_per_hour != expected.cents_per_hour
+            or self.planned != expected.planned
+            or self.absolute != expected.absolute
+        ):
+            raise ValueError("billing ledger limits conflict with gate policy")
 
     @staticmethod
     def _hash(event_without_hash: dict) -> str:
@@ -79,6 +113,16 @@ class BillingLedger:
             previous_hash = claimed_hash
         return events
 
+    def has_transaction(self, transaction_id: str) -> bool:
+        if not transaction_id:
+            raise ValueError("billing transaction ID is required")
+        matches = [
+            event for event in self.read() if event.get("transaction_id") == transaction_id
+        ]
+        if len(matches) > 1:
+            raise ValueError("billing transaction is duplicated")
+        return bool(matches)
+
     def totals(self) -> LedgerTotals:
         events = self.read()
         if not events:
@@ -86,8 +130,20 @@ class BillingLedger:
         final = events[-1]
         return LedgerTotals(final["cumulative_seconds"], final["cumulative_cents"])
 
-    def append(self, *, category: str, duration_seconds: int, deployment_id: str) -> dict:
-        if not category or not deployment_id or not isinstance(duration_seconds, int):
+    def append(
+        self,
+        *,
+        category: str,
+        duration_seconds: int,
+        deployment_id: str,
+        transaction_id: str | None = None,
+    ) -> dict:
+        if (
+            not category
+            or not deployment_id
+            or not isinstance(duration_seconds, int)
+            or (transaction_id is not None and not transaction_id)
+        ):
             raise ValueError("ledger event fields are invalid")
         if duration_seconds < 0:
             raise ValueError("duration_seconds cannot be negative")
@@ -99,13 +155,34 @@ class BillingLedger:
         except (BlockingIOError, OSError) as error:
             raise ValueError("billing ledger is locked or unwritable") from error
         try:
-            return self._append_locked(category, duration_seconds, deployment_id)
+            return self._append_locked(
+                category, duration_seconds, deployment_id, transaction_id
+            )
         finally:
             fcntl.flock(lock_descriptor, fcntl.LOCK_UN)
             os.close(lock_descriptor)
 
-    def _append_locked(self, category: str, duration_seconds: int, deployment_id: str) -> dict:
+    def _append_locked(
+        self,
+        category: str,
+        duration_seconds: int,
+        deployment_id: str,
+        transaction_id: str | None,
+    ) -> dict:
         events = self.read()
+        if transaction_id is not None:
+            matches = [event for event in events if event.get("transaction_id") == transaction_id]
+            if len(matches) > 1:
+                raise ValueError("billing transaction is duplicated")
+            if matches:
+                event = matches[0]
+                if (
+                    event["category"] != category
+                    or event["duration_seconds"] != duration_seconds
+                    or event["deployment_id"] != deployment_id
+                ):
+                    raise ValueError("billing transaction conflicts")
+                return event
         previous = events[-1]["event_sha256"] if events else None
         previous_seconds = events[-1]["cumulative_seconds"] if events else 0
         cumulative_seconds = previous_seconds + duration_seconds
@@ -119,6 +196,8 @@ class BillingLedger:
             "cumulative_cents": cumulative_cents,
             "previous_sha256": previous,
         }
+        if transaction_id is not None:
+            event["transaction_id"] = transaction_id
         event["event_sha256"] = self._hash(event)
         events.append(event)
         try:

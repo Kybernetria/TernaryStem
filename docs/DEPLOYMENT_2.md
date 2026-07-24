@@ -14,7 +14,7 @@ This deployment is **not** a QAT run and is not an official test evaluation. It 
 - record quality, parameters, operator shapes, VRAM, throughput, GPU-hours, and dollars;
 - stop when a pre-registered quality or cost gate fails;
 - never start sensitivity, PTQ, QAT, distillation, or an extra-data experiment;
-- plan for at most 45 billed instance-hours and stop absolutely before 50 billed hours at the approved $0.80/hour offer (`$36` planned, `$40` absolute).
+- plan for at most 7.5 billed instance-hours and stop absolutely before 8.75 billed hours at the approved $0.80/hour offer (`$6` planned, `$7` absolute).
 
 Every setup, preflight, retry, validation, synchronization, and idle minute counts against the persistent cumulative ledger. A restart must not reset it.
 
@@ -81,7 +81,7 @@ Both candidates must use:
 - dynamic cross-track remix, gain, stereo swap, and polarity policy;
 - FP32 qualifying precision;
 - a predeclared maximum-horizon scheduler from the first launch;
-- equivalent optimizer-update and effective-batch semantics, using gradient accumulation only if physical batches differ;
+- equivalent optimizer-update and effective-batch semantics: Candidates A and B use physical batch 1 with four-step gradient accumulation for effective batch 4;
 - the existing 140-chunk diagnostic for continuity;
 - a separate track-balanced or whole-track development confirmation path;
 - no official test, extra data, teacher, shifts, ensembles, or source-specific model bag.
@@ -126,11 +126,11 @@ The authoritative executable check is `python scripts/deployment_2.py readiness`
 | 9 | Stable validation IDs and float64 track energies | PASS locally |
 | 10 | Official-test path denial before audio access | PASS locally |
 | 11 | FP-only allowlist and gate-policy hashes | PASS locally |
-| 12 | Verified process-group supervision, transaction crash recovery, receipt-last sync, and no inherited launcher lock | PASS locally; 31 focused matrix tests recorded in `results/readiness/controller_fake_matrix.json` |
-| 13 | Clean frozen source commit bound by `.deployment2-lock.json` | PASS in the current checkout; regenerate the ignored lock after any authorized source change |
-| 14 | Authorized local CUDA-required evidence | **OPEN — no authorized local GPU evidence exists** |
+| 12 | Verified process-group supervision, transaction crash recovery, receipt-last sync, and no inherited launcher lock | PASS locally; 36 focused tests recorded in `results/readiness/controller_fake_matrix.json` |
+| 13 | Clean frozen source commit bound by `.deployment2-lock.json` | **OPEN — review and commit the pending revision, then regenerate the ignored lock** |
+| 14 | Authorized local CUDA-required evidence | **OPEN — rerun the schema-v2 full candidate CUDA probe after item 13** |
 
-Therefore deployment remains **NO-GO** solely on the authorized CUDA-required readiness evidence in item 14. A rental or CPU fallback must not be used to turn that item green.
+Therefore deployment remains **NO-GO** until the revised controller matrix, frozen source lock, and full CUDA evidence all pass. A CPU fallback must not be used to turn those items green.
 
 ## 6. Paid rungs and gates
 
@@ -149,7 +149,7 @@ Pass requirements:
 - no reconstruction, silence, or shape failure;
 - measured VRAM, chunks/s, validation seconds, and operator inventory;
 - control C reproduces deployment #1's early curve within a predeclared tolerance;
-- projected worst-case deployment, including 20% overhead, fits within 45 billed hours.
+- projected worst-case deployment, including 20% overhead, fits within the 7.5-hour planned budget.
 
 Do not eliminate A or B solely for early rank at 10k. Stop the deployment if either cannot fit the frozen physical/effective-batch contract or if the cost projection fails.
 
@@ -183,13 +183,13 @@ After promotion, continue to 300k and run the broader development-only confirmat
 - at least 6.3 dB development `global_sdr`;
 - positive credible learning-curve extrapolation toward 7.5 dB;
 - acceptable per-stem and whole-track development behavior;
-- enough ledger reserve to finish before the planned $36 cutoff.
+- enough ledger reserve to finish before the planned $6 cutoff.
 
 Otherwise stop and publish a negative result.
 
 ### Final continuation
 
-Only the selected system may continue, using the same optimizer, scheduler, samples, and checkpoint lineage. Stop at the first qualifying checkpoint or the planned 45-hour cutoff. The operator must terminate before 50 billed hours / $40 under all circumstances.
+Only the selected system may continue, using the same optimizer, scheduler, samples, and checkpoint lineage. Stop at the first qualifying checkpoint or the planned 7.5-hour cutoff. The operator must terminate before 8.75 billed hours / $7 under all circumstances.
 
 ## 7. Success and failure decisions
 

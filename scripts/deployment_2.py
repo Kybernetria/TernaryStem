@@ -36,7 +36,7 @@ def main() -> int:
         payload = cuda_probe(args.repository, args.allowlist)
         atomic_json_save(payload, args.output)
         print(json.dumps(payload, indent=2))
-        return 0
+        return 0 if payload.get("passed") else 1
     payload = readiness_matrix(args.repository, args.allowlist, args.cuda_evidence)
     print(json.dumps(payload, indent=2))
     return 0 if payload["ready"] else 1

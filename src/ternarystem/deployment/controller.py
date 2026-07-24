@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Callable
 from pathlib import Path
 
@@ -26,6 +27,7 @@ class SerialRungController:
         run_root: str | Path,
         remote_root: str | Path,
         ledger: BillingLedger,
+        gate_policy: dict,
     ) -> None:
         self.deployment_id = deployment_id
         self.candidate_id = candidate_id
@@ -35,6 +37,20 @@ class SerialRungController:
         self.manifest_path = self.root / "manifest.json"
         self.state = RungState(self.root / "state.json")
         self.sync = ArtifactSynchronizer(remote_root)
+        ledger.assert_matches_gate_policy(gate_policy)
+        reserve = gate_policy.get("reserve") if isinstance(gate_policy, dict) else None
+        if (
+            not isinstance(reserve, dict)
+            or not isinstance(reserve.get("overhead_fraction"), (int, float))
+            or isinstance(reserve.get("overhead_fraction"), bool)
+            or not 0 <= reserve["overhead_fraction"] <= 1
+            or not isinstance(reserve.get("synchronization_seconds"), int)
+            or isinstance(reserve.get("synchronization_seconds"), bool)
+            or reserve["synchronization_seconds"] < 0
+        ):
+            raise ValueError("gate policy reserve is invalid")
+        self.reserve_overhead = float(reserve["overhead_fraction"])
+        self.synchronization_seconds = reserve["synchronization_seconds"]
         self.ledger = ledger
 
     def execute(
@@ -56,9 +72,26 @@ class SerialRungController:
             payload = self.state.read()
         if payload["state"] in {"gate_passed", "stopped"}:
             return payload
-        self.ledger.assert_within_absolute(billed_seconds)
+        local_training_complete = payload["state"] == "running" and self._valid_local_checkpoint()
+        needs_training = payload["state"] == "pending" or (
+            payload["state"] == "running" and not local_training_complete
+        )
+        if needs_training:
+            self.ledger.assert_within_absolute(billed_seconds)
+            required_reserve = (
+                math.ceil(billed_seconds * (1 + self.reserve_overhead))
+                + self.synchronization_seconds
+            )
+            if not self.ledger.has_planned_reserve(required_reserve):
+                raise ValueError("planned deployment budget has insufficient reserve")
+        elif payload["state"] == "running":
+            # Training completed before a crash but has not been billed yet.
+            self.ledger.assert_within_absolute(billed_seconds)
         if payload["state"] == "pending":
             payload = self.state.transition("running", expected_revision=payload["revision"])
+        billing_transaction = (
+            f"{self.deployment_id}:{self.candidate_id}:{self.rung_id}:training"
+        )
         if payload["state"] == "running":
             if (self.checkpoint.exists() or self.manifest_path.exists()) and not self._valid_local_checkpoint():
                 raise ValueError("partial or conflicting local rung artifacts")
@@ -72,14 +105,19 @@ class SerialRungController:
                 expected_revision=payload["revision"],
                 checkpoint_sha256=manifest["checkpoint_sha256"],
             )
+            if fault_hook:
+                fault_hook("after_checkpoint_state_before_billing")
+        if payload["state"] == "checkpointed":
+            if not self.ledger.has_transaction(billing_transaction):
+                self.ledger.assert_within_absolute(billed_seconds)
             self.ledger.append(
                 category="training",
                 duration_seconds=billed_seconds,
                 deployment_id=self.deployment_id,
+                transaction_id=billing_transaction,
             )
             if fault_hook:
                 fault_hook("after_checkpoint_state")
-        if payload["state"] == "checkpointed":
             manifest = self._read_manifest()
             receipt = self.sync.publish(
                 deployment_id=self.deployment_id,

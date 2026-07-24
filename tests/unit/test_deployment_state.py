@@ -3,6 +3,7 @@ import json
 import pytest
 
 from ternarystem.deployment import BillingLedger, RungState, SyncReceipt
+from ternarystem.deployment.gates import load_gate_policy
 
 
 def test_billing_ledger_is_cumulative_hash_chained_and_persistent(tmp_path):
@@ -17,6 +18,31 @@ def test_billing_ledger_is_cumulative_hash_chained_and_persistent(tmp_path):
     assert BillingLedger(path).totals().cents == 120
 
 
+def test_billing_transaction_is_idempotent_and_conflicts_fail_closed(tmp_path):
+    ledger = BillingLedger(tmp_path / "transactions.json")
+    first = ledger.append(
+        category="training",
+        duration_seconds=60,
+        deployment_id="d2",
+        transaction_id="d2:A:10k:training",
+    )
+    repeated = ledger.append(
+        category="training",
+        duration_seconds=60,
+        deployment_id="d2",
+        transaction_id="d2:A:10k:training",
+    )
+    assert repeated == first
+    assert len(ledger.read()) == 1
+    with pytest.raises(ValueError, match="conflicts"):
+        ledger.append(
+            category="training",
+            duration_seconds=61,
+            deployment_id="d2",
+            transaction_id="d2:A:10k:training",
+        )
+
+
 def test_billing_ledger_corruption_and_absolute_cutoff_fail_closed(tmp_path):
     path = tmp_path / "ledger.json"
     ledger = BillingLedger(path)
@@ -28,10 +54,23 @@ def test_billing_ledger_corruption_and_absolute_cutoff_fail_closed(tmp_path):
         ledger.totals()
 
     cutoff = BillingLedger(tmp_path / "cutoff.json")
-    cutoff.append(category="training", duration_seconds=179_999, deployment_id="d2")
+    assert cutoff.planned.seconds == 27_000
+    assert cutoff.planned.cents == 600
+    assert cutoff.absolute.seconds == 31_500
+    assert cutoff.absolute.cents == 700
+    cutoff.append(category="training", duration_seconds=31_499, deployment_id="d2")
     with pytest.raises(ValueError, match="absolute"):
         cutoff.assert_within_absolute(1)
     assert not cutoff.has_planned_reserve(1)
+
+
+def test_billing_ledger_is_constructed_from_exact_gate_policy(tmp_path):
+    policy = load_gate_policy("configs/deployment_2/gate_policy.yaml")
+    ledger = BillingLedger.from_gate_policy(tmp_path / "policy-ledger.json", policy)
+    ledger.assert_matches_gate_policy(policy)
+    mismatched = BillingLedger(tmp_path / "wrong.json", absolute_cents=701)
+    with pytest.raises(ValueError, match="conflict"):
+        mismatched.assert_matches_gate_policy(policy)
 
 
 def test_rung_cannot_promote_before_verified_remote_commit(tmp_path):
