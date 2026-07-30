@@ -41,4 +41,4 @@ The tradeoff was approximately 6.5–6.9 ms one-time preparation and 1,849,216 a
 - Formal Gate 0, quality, deployment, portability, energy, threading, and production gates remain open.
 - No Phase 5 work was started.
 
-The canonical external TSRC used by the experiments had SHA-256 `067d88c5448a37ac46372769e21ce50ef4ce1b01af5682372c8e428e915359a4`. Bulk evidence and implementation snapshots remain outside the published branch to keep the repository small.
+The canonical external TSRC used by the experiments had SHA-256 `067d88c5448a37ac46372769e21ce50ef4ce1b01af5682372c8e428e915359a4`. Bulk evidence and implementation snapshots remain outside the published branch to keep the repository small. Model files were not published because MUSDB18-HQ permits educational use but does not clearly grant unrestricted redistribution rights for trained weights; the [model card](MODEL_CARD.md) records the privately retained artifact identities.

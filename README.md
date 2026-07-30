@@ -2,7 +2,8 @@
 
 Research implementation of a joint four-stem TFC-TDF separator with mixed ternary, W4A8, W8A8, and FP32 precision plus packed native ternary kernels.
 
-> This repository is an experimental scaffold. It does not yet include trained weights and has not passed Gate 0 in [the plan](docs/PLAN.md).
+> [!IMPORTANT]
+> This experiment is concluded and the repository is retained as an unmaintained research archive. It includes no trained weights and did not pass Gate 0 or its quality gates. See the [model card](docs/MODEL_CARD.md), [final status](docs/STATUS.md), and [native-runtime history](docs/EXPERIMENT_HISTORY.md).
 
 ## Setup
 
@@ -97,4 +98,4 @@ Capture candidate operator shapes with:
 python scripts/inventory.py --config configs/experiment.yaml
 ```
 
-The benchmark contract is frozen in [`docs/BENCHMARK_PROTOCOL.md`](docs/BENCHMARK_PROTOCOL.md). See [`docs/STATUS.md`](docs/STATUS.md) for completed work and open gates. A compact summary of unpublished native-runtime experiments is in [`docs/EXPERIMENT_HISTORY.md`](docs/EXPERIMENT_HISTORY.md); their implementation and bulk evidence are intentionally not on `main`. To resume work in a fresh assistant session, copy [`docs/NEW_SESSION_PROMPT.md`](docs/NEW_SESSION_PROMPT.md). Dataset audio, generated stems, checkpoints, and binaries must not be committed.
+The benchmark contract is frozen in [`docs/BENCHMARK_PROTOCOL.md`](docs/BENCHMARK_PROTOCOL.md). See [`docs/STATUS.md`](docs/STATUS.md) for completed work and unresolved gates. A compact summary of unpublished native-runtime experiments is in [`docs/EXPERIMENT_HISTORY.md`](docs/EXPERIMENT_HISTORY.md); their implementation and bulk evidence are intentionally not on `main`. Dataset audio, generated stems, checkpoints, and binaries are not distributed by this archive.

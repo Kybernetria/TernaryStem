@@ -2,7 +2,7 @@
 
 ## Status
 
-Research scaffold with recorded remote development experiments, including one stopped RTX 5090 FP32 complex-mask baseline. No checkpoint is released and no separation-quality claim is made.
+Concluded, unmaintained research experiment with recorded remote development runs and proportional native-runtime feasibility work. No checkpoint is released and no separation-quality claim is made. The repository is source/history only.
 
 ## Intended use
 
@@ -18,13 +18,25 @@ Deployment #2 adds two unreleased FP candidates. `ternarystem_v2_fullband_tempor
 
 ## Training and evaluation
 
-The benchmark contract uses MUSDB18-HQ and the frozen 86/14 development split in `BENCHMARK_PROTOCOL.md`. Dataset audio and weights are not distributed here. Redistribution terms must be reviewed before publishing a trained checkpoint.
+The benchmark contract used MUSDB18-HQ and the frozen 86/14 development split in `BENCHMARK_PROTOCOL.md`. Dataset audio and weights are not distributed here. The official [MUSDB18-HQ record](https://doi.org/10.5281/zenodo.3338373) limits the material to educational use and identifies heterogeneous underlying rights: DSD100/Mixing Secrets, CC BY-NC-SA 4.0 MedleyDB tracks, Native Instruments tracks, and CC BY-NC-SA 3.0 Easton Ellises tracks. Neither that record nor the [MUSDB documentation](https://sigsep.github.io/datasets/musdb.html) clearly grants unrestricted redistribution rights for trained weights. The project therefore publishes hashes and provenance, not model files.
 
 The first recorded remote smoke experiment is under `results/remote/2026-07-17-selective-ternary/`. Its 632,208-parameter FP warm-up remained at -3.5326 dB validation diagnostic `global_sdr`. Matched ten-epoch continuations reached -3.1445 dB for FP32 and -3.1669 dB when TDF Linear and bottleneck convolution families used selective ternary QAT. The -0.0224 dB difference is evidence for reduced-task QAT recovery only. It is not museval/BSSEval and the negative absolute diagnostic confirms that this is not a useful released separator.
 
 A bounded-complex-mask FP32 baseline is recorded under `results/remote/2026-07-23-vast-fp32-plateau/`. The 632,208-parameter model completed 31 epochs / 310,000 chunks on an RTX 5090. Its best checkpoint was record epoch index 23 (the 24th completed epoch, after 240,000 chunks) at 5.4480 dB development `global_sdr`, with same-checkpoint vocals/drums/bass/other values of 6.1231/5.9805/5.4315/4.2568 dB. This failed the 7.5 dB FP gate, the run was stopped, and no sensitivity or QAT ran.
 
 The official MUSDB test set has not been evaluated. Training records emit explicitly labeled development-only overall/per-stem `global_sdr`, per-stem waveform L1, and a trivial equal-share (`mixture / 4`) baseline. These are not museval/BSSEval.
+
+## Preserved artifact identities
+
+The following privately retained artifacts were judged potentially useful for future research but are intentionally not downloadable from this public archive:
+
+| Artifact | Size | SHA-256 |
+|---|---:|---|
+| Candidate-A pre-QAT best checkpoint | 29,167,307 bytes | `c66f1df99948d0c4abcfa09f4c1188b6246ac70cf1e8003c2880589e90bfd23c` |
+| Candidate-A final QAT best checkpoint | 28,972,811 bytes | `4f4098b2c708525918ad182bd5b077d47b5b975518c26e4f46b1ce9ee0ae8a4b` |
+| Candidate-A canonical packed TSRC | 2,740,800 bytes | `067d88c5448a37ac46372769e21ce50ef4ce1b01af5682372c8e428e915359a4` |
+
+These identities do not imply that the artifacts are safe to deserialize, licensed for redistribution, quality-qualified, or recoverable from the repository. Raw PyTorch checkpoints are pickle-based and should not be loaded from an untrusted source.
 
 ## Limitations
 

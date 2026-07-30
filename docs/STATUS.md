@@ -1,5 +1,7 @@
 # Implementation Status
 
+> **Final disposition:** the experiment is concluded and this repository is an unmaintained archive. No quality, deployment, portability, or production gate passed. No further training, QAT, native-runtime campaign, or deployment is authorized by this record.
+
 ## Completed locally
 
 - Repository/package/config/CI scaffold.
@@ -38,7 +40,7 @@ Deployment #1 is recorded under `results/remote/2026-07-23-vast-fp32-plateau/`. 
 
 The RTX 5090 sustained approximately 53–54 chunks/s, with about 5.39 GiB peak allocated and 6.42 GiB peak reserved. The run bundle and checkpoint hashes were independently copied to and content-checked on Filen; checkpoints remain outside Git. This result is not BSSEval and is 2.0520 dB below Gate 1.
 
-Deployment #2 is being revised as an FP-only, $7-absolute-cap architecture screen. Local implementation includes an architecture registry; the exact 2,398,783-parameter full-spectrum TernaryStem-v2 candidate; the pinned 10,578,768-parameter SCNet core and separately labeled canonical adapter; RNG-complete schema-v2 checkpoints; immutable-horizon rung stops; stable validation identities and float64 track energies; an FP-only hash allowlist; machine-readable gates; a hash-chained billing ledger; verified synchronization receipts; and PID/PGID identity supervision. The 31-test fake-controller matrix covers transaction crash recovery, receipt-last immutable synchronization, concurrent-sync refusal, ledger/state gates, and process supervision. A Tesla T4 probe showed that physical batch 4 OOMs for both candidates and exposed CUDA-mapped RNG-state resume failure. The current revision uses physical batch 1 with four-step accumulation, fixes CUDA RNG restoration, requires full candidate execution in CUDA evidence, and passes the regenerated 36-test controller matrix plus all 123 Python tests. Deployment remains `NO-GO` until the source is frozen and passes a fresh full CUDA probe.
+Deployment #2 was revised as an FP-only, $7-absolute-cap architecture screen. Local implementation included an architecture registry; the exact 2,398,783-parameter full-spectrum TernaryStem-v2 candidate; the pinned 10,578,768-parameter SCNet core and separately labeled canonical adapter; RNG-complete schema-v2 checkpoints; immutable-horizon rung stops; stable validation identities and float64 track energies; an FP-only hash allowlist; machine-readable gates; a hash-chained billing ledger; verified synchronization receipts; and PID/PGID identity supervision. The 31-test fake-controller matrix covered transaction crash recovery, receipt-last immutable synchronization, concurrent-sync refusal, ledger/state gates, and process supervision. A Tesla T4 probe showed that physical batch 4 OOMed for both candidates and exposed CUDA-mapped RNG-state resume failure. The final revision used physical batch 1 with four-step accumulation, fixed CUDA RNG restoration, required full candidate execution in CUDA evidence, and passed the regenerated 36-test controller matrix plus all 123 Python tests. Deployment closed `NO-GO`; the missing fresh full CUDA probe was not run.
 
 ## Verification in this environment
 
